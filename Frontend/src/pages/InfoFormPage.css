@@ -1,0 +1,52 @@
+/* InfoFormPage.css */
+
+/* 페이지 컨테이너 */
+.info-page-container {
+  width: 100%;
+  padding: 2rem;
+}
+
+.info-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* 각 폼 그룹 */
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.3rem;
+}
+
+.form-group input {
+  background-color: #f2f2f2;
+  color: #000;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+/* 체크박스 */
+.form-check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* 시작 버튼 */
+.start-button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.start-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
