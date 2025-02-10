@@ -76,7 +76,7 @@ function ChatPage() {
   const getQuestionKey = (index) => {
     switch (index) {
       case 0:
-        return "증상 내용용";
+        return "증상 내용";
       case 1:
         return "증상 기간";
       case 2:
