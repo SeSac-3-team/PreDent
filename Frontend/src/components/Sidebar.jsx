@@ -26,9 +26,6 @@ function Sidebar() {
         <Link to="/" className="menu-item">
           사용자 정보 입력
         </Link>
-        <Link to="/questionnaire" className="menu-item">
-          사전 문진
-        </Link>
         <Link to="/chat" className="menu-item">
           대화 시작
         </Link>
