@@ -175,7 +175,7 @@ function ChatPage() {
 
   // 간단 fetch 함수 (LLM API 호출)
   const fetchLLMResponse = async (userMessage) => {
-    const apiUrl = `http://127.0.0.1:8000/chat/${encodeURIComponent(
+    const apiUrl = `http://127.0.0.1:8010/chat/${encodeURIComponent(
       userMessage
     )}`;
     try {
