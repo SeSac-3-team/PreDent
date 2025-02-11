@@ -11,10 +11,12 @@ from typing import Literal
 
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_teddynote.messages import random_uuid
+from typing import Dict, Any
+
 
 from Utils.sql_agent import sql_node
 from Utils.rag_agent import rag_node
-from Utils.chat_agent import chat_node
+from Utils.chat_agent import chat_node  # ✅ 일반적인 질문에 답변하는 Agent 추가
 
 # ✅ Load environment variables
 import os
@@ -41,12 +43,11 @@ class AgentState(TypedDict):
     next: str  # 다음으로 라우팅할 에이전트
 
 # ✅ 멤버 Agent 목록 정의
-members = ["SQLagent", "RAGagent", "CHATagent"]
+members = ["SQLagent", "RAGagent","CHATagent" ]
 options_for_next = ["FINISH"] + members  # FINISH 포함
 
 # ✅ Supervisor의 응답 모델 (RouteResponse)
-class RouteResponse(BaseModel):
-    
+class RouteResponse(BaseModel):  
     next: Literal[*options_for_next]  # 다음 실행할 Agent
 
 # ✅ Define system prompt
@@ -57,7 +58,8 @@ system_prompt = (
     " - If the request is related to patient information, choose SQLagent."
     " - If the request is related to cost, choose RAGagent."
     " - If the request requires retrieving patient information before answering a cost-related question, first choose SQLagent, then choose RAGagent."
-    " When finished, respond with FINISH."
+    " - If the request is a general inquiry, choose CHATagent."
+    " You must select at least one agent before finishing."
 )
 
 # ✅ ChatPromptTemplate 생성
@@ -68,7 +70,7 @@ prompt = ChatPromptTemplate.from_messages(
         (
             "system",
             "Given the conversation above, who should act next? "
-            "Or should we FINISH? Select one of: {options}",
+            "Or should we FINISH? Select one of: {options}. After at least one agent has acted, you may select FINISH.",
         ),
     ]
 ).partial(options=str(options_for_next), members=", ".join(members))
@@ -76,14 +78,15 @@ prompt = ChatPromptTemplate.from_messages(
 # ✅ LLM Initialization
 llm = ChatOpenAI(model="gpt-4o", temperature=0)
 
-
 # Supervisor Agent 생성
 def supervisor_agent(state):
 
     # 프롬프트와 LLM을 결합하여 체인 구성
     supervisor_chain = prompt | llm.with_structured_output(RouteResponse)
     # Agent 호출
-    return supervisor_chain.invoke(state)
+    response = supervisor_chain.invoke(state)
+    
+    return response
 
 # ✅ LangGraph Workflow 생성
 workflow = StateGraph(AgentState)
@@ -91,17 +94,17 @@ workflow = StateGraph(AgentState)
 # ✅ Define Nodes
 workflow.add_node("SQLagent", sql_node)
 workflow.add_node("RAGagent", rag_node)
-workflow.add_node("CHATagent", chat_node)
+workflow.add_node("CHATagent", chat_node)  # ✅ 일반적인 질문을 위한 Agent 추가
 workflow.add_node("Supervisor", supervisor_agent)
 
 # ✅ Agent → Supervisor 이동
 for member in members:
-    workflow.add_edge(member, "Supervisor")
+    if member != "CHATagent":
+        workflow.add_edge(member, "Supervisor")
 
-# ✅ Supervisor가 조건에 따라 다음 Agent 선택
-conditional_map = {k: k for k in members}
-conditional_map["FINISH"] = END
-
+# # ✅ Supervisor가 조건에 따라 다음 Agent 선택
+    conditional_map = {k: k for k in members}
+    conditional_map["FINISH"] = END
 
 def get_next(state):
     return state["next"]
@@ -109,21 +112,28 @@ def get_next(state):
 # ✅ Supervisor → 다음 Agent (조건부 경로 설정)
 workflow.add_conditional_edges("Supervisor", get_next, conditional_map)
 
-
 # ✅ 시작점 설정
 workflow.add_edge(START, "Supervisor")
+workflow.add_edge("CHATagent", END)
 
 # ✅ 그래프 컴파일 (PostgreSQL 체크포인트 적용)
 async def compile_graph():
     async with AsyncPostgresSaver.from_conn_string(DB_URI) as checkpointer:
         return workflow.compile(checkpointer=checkpointer)
-
+    
+    
 # ✅ 실행 함수 (Supervisor 호출)
 async def agent_response(input_string: str):
     async with AsyncPostgresSaver.from_conn_string(DB_URI) as checkpointer:
         graph = workflow.compile(checkpointer=checkpointer)
     
-        thread_id = str(6)  # thread_id를 문자열로 변환
+        img_data = graph.get_graph().draw_mermaid_png()
+        # PNG 파일로 저장
+        with open("mermaid_graph.png", "wb") as f:
+            f.write(img_data)
+ 
+  
+        thread_id = str(random_uuid)  # thread_id를 문자열로 변환
 
         config = RunnableConfig(recursion_limit=10, configurable={"thread_id": thread_id})
         response = ""
