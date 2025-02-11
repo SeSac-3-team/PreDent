@@ -6,4 +6,5 @@ urlpatterns = [
     path("presum/<str:input_string>", views.presum_response, name="presum_response"),
     path("save-object/", views.medicert_save, name="medicert_save"),    
     path("chat/<str:input_string>", views.chatbot_response, name="chatbot_response"),
+    path('save_patient/', views.save_patient, name='save_patient'),
 ]

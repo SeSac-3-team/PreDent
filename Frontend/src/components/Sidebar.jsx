@@ -1,7 +1,7 @@
 // src/components/Sidebar.jsx
 import React from "react";
 import { Link } from "react-router-dom";
-import "./Sidebar.css"; // 사이드바용 CSS
+import "./Sidebar.css"; // 사이드바 CSS
 
 function Sidebar() {
   return (

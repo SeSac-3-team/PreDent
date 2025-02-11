@@ -3,14 +3,14 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import axios from "axios";
-import { useLocation } from "react-router-dom"; // [변경]
+import { useLocation } from "react-router-dom";
 import "./ChatPage.css";
 
 function ChatPage() {
-  // [변경] "치료" 선택 여부 확인
-  const location = useLocation(); // [변경]
-  const perpose = location.state?.perpose || ""; // [변경]
-  const isSimpleChat = perpose !== "치료"; // [변경]
+  // "치료" 선택 여부 확인
+  const location = useLocation();
+  const purpose = location.state?.purpose || "";
+  const isSimpleChat = purpose !== "치료";
 
   // -----------------------------
   // 1) 기존 텍스트 채팅 상태 및 로직
@@ -25,7 +25,6 @@ function ChatPage() {
   ]);
 
   const [messages, setMessages] = useState([]);
-  const [message2, setMessage2] = useState("");
   const [vas, setVas] = useState("");
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
@@ -38,18 +37,18 @@ function ChatPage() {
   // 첫 질문을 한 번만 추가하기 위한 Ref
   const hasInitialized = useRef(false);
   useEffect(() => {
-    // [변경] 첫 렌더링 시, "치료"가 아닐 경우 문진 없이 간단 인사만
+    // 첫 렌더링 시, "치료"가 아닐 경우 문진 없이 간단 인사 진행
     if (!hasInitialized.current) {
       hasInitialized.current = true;
       if (isSimpleChat) {
-        setIsQuestionnaireCompleted(true); // [변경]
+        setIsQuestionnaireCompleted(true);
         setMessages([
           {
             text: "안녕하세요!😊\n자유롭게 채팅을 이용해보세요!",
             sender: "bot",
             avatar: "public/images/Doctor_img.png",
           },
-        ]); // [변경]
+        ]);
       } else if (questions.length > 0) {
         setMessages([
           {
@@ -186,12 +185,10 @@ function ChatPage() {
         axios
           .post("http://127.0.0.1:8000/save-object/", data)
           .then((response) => {
-            console.log("성공:", response.data);
-            setMessage2("데이터 저장 성공!");
+            console.log("데이터 저장 성공:", response.data);
           })
           .catch((error) => {
-            console.error("실패:", error);
-            setMessage2("데이터 저장 실패");
+            console.error("데이터 저장 실패:", error);
           });
 
         // 사전문진 렌더링 및 멀티턴 시작작
@@ -207,7 +204,7 @@ function ChatPage() {
         ]);
       }
     } else {
-      // 문진이 완료된 상태 or 치과방문 간단 모드일 때(처음부터)
+      // 문진이 완료된 상태 or 치료 목적이 아닌 방문일 때(처음부터)
       setMessages((prev) => [...prev, { text: answer, sender: "user" }]);
       const llmResponse = await fetchLLMResponse(answer);
       setMessages((prev) => [
@@ -392,7 +389,7 @@ function ChatPage() {
       {/* STT 결과 표시 */}
       {transcription && (
         <div className="stt-result">
-          <strong>STT 결과:</strong> {transcription}
+          <strong>녹음 결과:</strong> {transcription}
         </div>
       )}
     </div>
