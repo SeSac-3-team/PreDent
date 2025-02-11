@@ -1,26 +1,33 @@
-from django.shortcuts import render
 from django.http import JsonResponse
-from langchain_openai import ChatOpenAI
-import os
 from dotenv import load_dotenv
+from Utils.vas import vas_cal
+from Utils.presum import get_presum
+from Utils.medicert import save_medicert
 from Utils.gpt import agent_response
 import asyncio
-
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
 
 load_dotenv(dotenv_path="myapp/.env")
 # Create your views here.
 
-def hello(request):
-    return JsonResponse(request, {'message' : 'hello'})
+def vas_response(request, input_string):
+	response = vas_cal(input_string)
+	return JsonResponse({'vas' : str(response)})
 
-def image_response(request):
-    imageUrl = 'https://png.pngtree.com/thumb_back/fh260/background/20230609/pngtree-three-puppies-with-their-mouths-open-are-posing-for-a-photo-image_2902292.jpg'
-    return render(request, 'image_test.html', {'image_response' : imageUrl})
+def presum_response(request, input_string):
+	response = get_presum(input_string)
+	return JsonResponse({'presum' : str(response)})
 
-def greeting(request, input_string):
-    return JsonResponse({'greeting' : f'Hello, {input_string}!'})
-
-# OpenAI API 키 설정
+@api_view(['POST'])
+def medicert_save(request):
+    data = request.data
+    try:
+        save_medicert(data)
+        return Response({"message": "데이터 저장 성공"}, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 def chatbot_response(request, input_string):
     """Django 뷰 함수 - 사용자의 질문을 받고 응답을 반환"""

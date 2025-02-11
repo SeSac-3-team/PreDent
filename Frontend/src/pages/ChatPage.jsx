@@ -1,6 +1,7 @@
 // src/pages/ChatPage.jsx
 
 import React, { useState, useRef, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
 import axios from "axios";
 import { useLocation } from "react-router-dom"; // [변경]
 import "./ChatPage.css";
@@ -24,6 +25,8 @@ function ChatPage() {
   ]);
 
   const [messages, setMessages] = useState([]);
+  const [message2, setMessage2] = useState("");
+  const [vas, setVas] = useState("");
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [input, setInput] = useState("");
@@ -73,7 +76,7 @@ function ChatPage() {
   const getQuestionKey = (index) => {
     switch (index) {
       case 0:
-        return "증상";
+        return "증상 내용";
       case 1:
         return "증상 기간";
       case 2:
@@ -89,22 +92,48 @@ function ChatPage() {
     }
   };
 
-  // 답변들을 채팅창에 출력하는 함수 (설문 종료 후 요약)
-  const renderAnswers = (answersToRender) => {
-    const answerElements = Object.entries(answersToRender).map(
-      ([key, value]) => (
-        <div key={key}>
-          <p>
-            {key}: {value}
-          </p>
-        </div>
-      )
-    );
+  // VAS 통증 지수를 계산하는 함수
+  const fetchVASResponse = async (userMessage) => {
+    const apiUrl = `http://127.0.0.1:8000/vas/${encodeURIComponent(
+      userMessage
+    )}`;
+    try {
+      const response = await fetch(apiUrl);
+      if (response.ok) {
+        const data = await response.json();
+        return data.vas;
+      } else {
+        return "API 요청에 실패했습니다.";
+      }
+    } catch (error) {
+      return `오류 발생: ${error.message}`;
+    }
+  };
 
+  // 사전 진단 LLM 응답을 반환하는 함수
+  const fetchPresumResponse = async (userMessage) => {
+    const apiUrl = `http://127.0.0.1:8000/presum/${encodeURIComponent(
+      userMessage
+    )}`;
+    try {
+      const response = await fetch(apiUrl);
+      if (response.ok) {
+        const data = await response.json();
+        return data.presum;
+      } else {
+        return "API 요청에 실패했습니다.";
+      }
+    } catch (error) {
+      return `오류 발생: ${error.message}`;
+    }
+  };
+
+  // 사전진단 렌더링 함수
+  const renderAnswers = (answersToRender) => {
     setMessages((prev) => [
       ...prev,
       {
-        text: <div>{answerElements}</div>,
+        text: <ReactMarkdown>{answersToRender}</ReactMarkdown>,
         sender: "bot",
         avatar: "public/images/Doctor_img.png",
       },
@@ -127,6 +156,10 @@ function ChatPage() {
 
       if (currentQuestionIndex < questions.length - 1) {
         // 다음 질문 출력
+        if (currentQuestionIndex === 0) {
+          const vas_res = await fetchVASResponse(answer);
+          setVas(vas_res);
+        }
         const nextIndex = currentQuestionIndex + 1;
         setCurrentQuestionIndex(nextIndex);
         setMessages((prev) => [
@@ -138,8 +171,31 @@ function ChatPage() {
           },
         ]);
       } else {
-        // 마지막 질문의 답변이면 설문 요약을 렌더링하고 LLM 대화 모드로 전환
-        renderAnswers(newAnswers);
+        // 마지막 질문의 답변이면 설문 요약 및 LLM 답변 반환
+        const answerString = JSON.stringify(newAnswers);
+        const pre_res = await fetchPresumResponse(answerString);
+
+        // DB 전송 객체 생성 및 전송송
+        const data = {
+          ...newAnswers,
+          vas_scale: vas,
+          pre_diagnosis: pre_res,
+          patid: 1,
+        };
+
+        axios
+          .post("http://127.0.0.1:8000/save-object/", data)
+          .then((response) => {
+            console.log("성공:", response.data);
+            setMessage2("데이터 저장 성공!");
+          })
+          .catch((error) => {
+            console.error("실패:", error);
+            setMessage2("데이터 저장 실패");
+          });
+
+        // 사전문진 렌더링 및 멀티턴 시작작
+        renderAnswers(pre_res);
         setIsQuestionnaireCompleted(true);
         setMessages((prev) => [
           ...prev,
