@@ -1,9 +1,10 @@
 // src/App.jsx (Routing Page)
-
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Sidebar from "./components/Sidebar"; // Sidebar 컴포넌트
 import InfoFormPage from "./pages/InfoFormPage"; // 개인정보 입력 페이지
 import ChatPage from "./pages/ChatPage"; // 채팅 페이지
+import VisitCheckPage from "./pages/VisitCheckPage"; // 방문이력 확인 페이지
+
 import "./App.css";
 
 function App() {
@@ -16,8 +17,11 @@ function App() {
         {/* 오른쪽 메인 컨텐츠 */}
         <div className="main-content">
           <Routes>
-            {/* "/" 경로 -> InfoFormPage (사용자 정보 입력 페이지) */}
-            <Route path="/" element={<InfoFormPage />} />
+            {/* "/" 경로 -> VisitCheckPage (병원 방문이력 확인 페이지) */}
+            <Route path="/" element={<VisitCheckPage />} />
+
+            {/* "/" 경로 -> InfoFormPage (사용자 정보입력 페이지) */}
+            <Route path="/info" element={<InfoFormPage />} />
 
             {/* "/chat" 경로 -> ChatPage (채팅 페이지) */}
             <Route path="/chat" element={<ChatPage />} />
