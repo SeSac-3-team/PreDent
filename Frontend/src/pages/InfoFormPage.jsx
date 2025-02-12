@@ -1,11 +1,8 @@
 // src/pages/InfoFormPage.jsx
 
-/* -----------------------
-   1) 개인정보 입력 페이지 
-------------------------*/
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "./InfoFormPage.css";
 
 function InfoFormPage() {
@@ -14,21 +11,45 @@ function InfoFormPage() {
   const [phone, setPhone] = useState("");
   const [birth, setBirth] = useState("");
   const [address, setAddress] = useState("");
-  const [perpose, setPerpose] = useState(false);
+  const [purpose, setPurpose] = useState("");
   const [agree, setAgree] = useState(false);
+  const [message, setMessage] = useState("");
 
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     if (!agree) {
-      alert("개인정보 수집 및 이용에 동의해야 사전진료를 시작할 수 있습니다.");
+      alert("개인정보 수집 및 이용에 동의 후 사전진료를 시작할 수 있습니다.");
       return;
     }
-    // 선택한 서비스 목적(perpose)을 함께 전달
-    navigate("/chat", { state: { perpose } });
-  };
 
+    // 백엔드에서 요구하는 key:value 맞추어 데이터 객체 생성
+    const data = {
+      name: name,
+      gender: gender,
+      phone: phone,
+      birth: birth,
+      address: address,
+      purpose: purpose,
+      agree: agree ? 1 : 0,
+    };
+
+    axios
+      .post("http://127.0.0.1:8000/save_patient/", data)
+      .then((response) => {
+        console.log("성공:", response.data);
+        setMessage("데이터 저장 성공!");
+        // 데이터 저장 후 ChatPage로 이동하고, 환자 정보(서비스 선택 값)를 전달합니다.
+        navigate("/chat", { state: { purpose: purpose } });
+      })
+      .catch((error) => {
+        console.error("실패:", error);
+        setMessage("데이터 저장 실패");
+      });
+  };
+  // 사용자 정보 입력란 화면 랜더링
   return (
     <div className="info-page-container">
       <h1>진료를 기다리고 계신가요?</h1>
@@ -39,7 +60,7 @@ function InfoFormPage() {
           <label>성명</label>
           <input
             type="text"
-            placeholder="Placeholder"
+            placeholder="성명을 입력하세요"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
@@ -75,7 +96,7 @@ function InfoFormPage() {
           <label>휴대폰 번호</label>
           <input
             type="text"
-            placeholder="Placeholder"
+            placeholder="휴대폰 번호를 입력하세요"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
           />
@@ -95,45 +116,45 @@ function InfoFormPage() {
           <label>주소</label>
           <input
             type="text"
-            placeholder="Placeholder"
+            placeholder="주소를 입력하세요"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
           />
         </div>
 
         <div className="form-group">
-          <label>서비스 선택</label>
+          <label>내원 목적</label>
           <div
-            className="perpose-check"
+            className="purpose-check"
             style={{ display: "flex", gap: "10rem" }}
           >
             <label>
               <input
                 type="radio"
-                name="perpose"
+                name="purpose"
                 value="치료"
-                checked={perpose === "치료"}
-                onChange={(e) => setPerpose(e.target.value)}
+                checked={purpose === "치료"}
+                onChange={(e) => setPurpose(e.target.value)}
               />
               치료
             </label>
             <label>
               <input
                 type="radio"
-                name="perpose"
+                name="purpose"
                 value="미용"
-                checked={perpose === "미용"}
-                onChange={(e) => setPerpose(e.target.value)}
+                checked={purpose === "미용"}
+                onChange={(e) => setPurpose(e.target.value)}
               />
               미용
             </label>
             <label>
               <input
                 type="radio"
-                name="perpose"
+                name="purpose"
                 value="교정"
-                checked={perpose === "교정"}
-                onChange={(e) => setPerpose(e.target.value)}
+                checked={purpose === "교정"}
+                onChange={(e) => setPurpose(e.target.value)}
               />
               교정
             </label>
@@ -156,6 +177,8 @@ function InfoFormPage() {
           사전진료 시작
         </button>
       </form>
+
+      {message && <p>{message}</p>}
     </div>
   );
 }
