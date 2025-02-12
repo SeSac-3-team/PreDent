@@ -37,7 +37,7 @@ function InfoFormPage() {
     };
 
     axios
-      .post("http://127.0.0.1:8000/save_patient/", data)
+      .post("http://127.0.0.1:8004/save_patient/", data)
       .then((response) => {
         console.log("성공:", response.data);
         setMessage("데이터 저장 성공!");

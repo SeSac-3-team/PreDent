@@ -16,7 +16,7 @@ function ChatPage() {
   // 1) 기존 텍스트 채팅 상태 및 로직
   // -----------------------------
   const [questions, setQuestions] = useState([
-    "환자분의 증상을 한 문장으로 표현해주세요. \n예) 왼쪽 어금니가 시려서 차가운 음식을 먹기 힘들어요.",
+    "환자분의 증상을 한 문장으로 표현해주세요. \n예) 어금니가 시려서 차가운 음식을 먹기 힘들어요.",
     "언제부터 증상이 시작되셨나요? \n예) 한 달 정도 된 것 같아요",
     "증상이 나타나는 부위는 어디인가요? \n예) 오른쪽 윗 어금니",
     "치아가 흔들리지는 않으시나요? \n예) 흔들리지는 않아요",
@@ -93,7 +93,7 @@ function ChatPage() {
 
   // VAS 통증 지수를 계산하는 함수
   const fetchVASResponse = async (userMessage) => {
-    const apiUrl = `http://127.0.0.1:8000/vas/${encodeURIComponent(
+    const apiUrl = `http://127.0.0.1:8004/vas/${encodeURIComponent(
       userMessage
     )}`;
     try {
@@ -111,7 +111,7 @@ function ChatPage() {
 
   // 사전 진단 LLM 응답을 반환하는 함수
   const fetchPresumResponse = async (userMessage) => {
-    const apiUrl = `http://127.0.0.1:8000/presum/${encodeURIComponent(
+    const apiUrl = `http://127.0.0.1:8004/presum/${encodeURIComponent(
       userMessage
     )}`;
     try {
@@ -130,24 +130,47 @@ function ChatPage() {
   const renderAnswers = (answersToRender) => {
     const diseaseCategory = answersToRender["질환 카테고리"];
     // public 폴더 내의 assets/images 경로를 기준으로 이미지 URL 구성
-    const imageUrl = `public/assets/images/${diseaseCategory}.jpg`; // 확장자가 jpg라고 가정
+    const imageUrlVAS = `public/assets/VASimages/${vas}.jpg`; // 확장자가 jpg라고 가정
+    const imageUrlDC = `public/assets/DCimages/${diseaseCategory}.jpg`; // 확장자가 jpg라고 가정
 
     // 텍스트와 이미지를 함께 렌더링하는 JSX 구성
     const content = (
       <div>
-        <img src={imageUrl} alt={diseaseCategory} className="customImage" />
-        <p>
-          문진 결과에 따른 귀하의 예상 질환은 {answersToRender["예상 질환"]}{" "}
-          으로 추정됩니다.
-        </p>
-        <p style={{ color: "red" }}>
-          ⚠️ 예상 질환은 참고용이며, 정확한 검사와 치료를 위해 치과 전문의의
-          상담이 꼭 필요합니다.
-        </p>
-        <ReactMarkdown>{answersToRender["질환 설명"]}</ReactMarkdown>
-        <ReactMarkdown>
-          {answersToRender["초기 관리 및 생활 습관 추천"]}
-        </ReactMarkdown>
+        <img
+          src={imageUrlVAS}
+          alt={vas}
+          style={{
+            width: "100%", // 전체 가로폭 차지
+            height: "auto",
+            display: "block", // block 요소로 만들어 margin 적용 가능
+            marginBottom: "20px", // 이미지 아래에 여백 추가
+          }}
+        />
+        <div style={{ display: "flex", alignItems: "flex-start" }}>
+          <img
+            src={imageUrlDC}
+            alt={diseaseCategory}
+            style={{
+              width: "200px", // 원하는 크기로 조정 (필요시 값 변경)
+              height: "auto",
+              marginRight: "20px", // 텍스트와의 간격 확보
+            }}
+          />
+          <div>
+            <p>
+              문진 결과에 따른 귀하의 예상 질환은 {answersToRender["예상 질환"]}{" "}
+              으로 추정됩니다.
+            </p>
+            <p style={{ color: "red" }}>
+              ⚠️ 예상 질환은 참고용이며, 정확한 검사와 치료를 위해 치과 전문의의
+              상담이 꼭 필요합니다.
+            </p>
+            <ReactMarkdown>{answersToRender["질환 설명"]}</ReactMarkdown>
+            <ReactMarkdown>
+              {answersToRender["초기 관리 및 생활 습관 추천"]}
+            </ReactMarkdown>
+          </div>
+        </div>
       </div>
     );
 
@@ -205,7 +228,7 @@ function ChatPage() {
         };
 
         axios
-          .post("http://127.0.0.1:8000/save-object/", data)
+          .post("http://127.0.0.1:8004/save-object/", data)
           .then((response) => {
             console.log("데이터 저장 성공:", response.data);
           })
@@ -229,10 +252,15 @@ function ChatPage() {
       // 문진이 완료된 상태 or 치료 목적이 아닌 방문일 때(처음부터)
       setMessages((prev) => [...prev, { text: answer, sender: "user" }]);
       const llmResponse = await fetchLLMResponse(answer);
+      const content2 = (
+        <div>
+          <ReactMarkdown>{llmResponse}</ReactMarkdown>
+        </div>
+      );
       setMessages((prev) => [
         ...prev,
         {
-          text: llmResponse,
+          text: content2,
           sender: "bot",
           avatar: "public/images/Doctor_img.png",
         },
@@ -250,7 +278,7 @@ function ChatPage() {
 
   // 간단 fetch 함수 (LLM API 호출)
   const fetchLLMResponse = async (userMessage) => {
-    const apiUrl = `http://127.0.0.1:8000/chat/${encodeURIComponent(
+    const apiUrl = `http://127.0.0.1:8004/chat/${encodeURIComponent(
       userMessage
     )}`;
     try {
