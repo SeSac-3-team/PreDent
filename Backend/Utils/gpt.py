@@ -38,24 +38,6 @@ async def get_checkpointer():
     async with AsyncPostgresSaver.from_conn_string(DB_URI) as checkpointer:
         return checkpointer
 
-# ✅ 데이터 정리 함수 (오래된 체크포인트 삭제)
-async def cleanup_old_checkpoints():
-    async with AsyncPostgresSaver.from_conn_string(DB_URI) as checkpointer:
-        async with checkpointer.conn.cursor() as cursor:
-            await cursor.execute("""
-                WITH RankedCheckpoints AS (
-    SELECT 
-        checkpoint_id,
-        ROW_NUMBER() OVER (
-            ORDER BY checkpoint_ns DESC, checkpoint_id DESC
-        ) AS rn
-    FROM public.checkpoints
-)
-DELETE FROM public.checkpoints
-USING RankedCheckpoints
-WHERE public.checkpoints.checkpoint_id = RankedCheckpoints.checkpoint_id
-AND RankedCheckpoints.rn > 30;
-            """)
 
 # 상태 정의
 class AgentState(TypedDict):
@@ -138,13 +120,12 @@ async def compile_graph():
 
 # ✅ 실행 함수 (Supervisor 호출)
 async def agent_response(input_string: str):
-    await cleanup_old_checkpoints()  # ✅ 실행 전 오래된 체크포인트 정리
     async with AsyncPostgresSaver.from_conn_string(DB_URI) as checkpointer:
         graph = workflow.compile(checkpointer=checkpointer)
         img_data = graph.get_graph().draw_mermaid_png()
         with open("mermaid_graph.png", "wb") as f:
             f.write(img_data)
-        thread_id = str(1115)
+        thread_id = str(random_uuid())
         config = RunnableConfig(recursion_limit=10, configurable={"thread_id": thread_id})
         response = ""
         checkpoint_tuples = []
@@ -154,4 +135,5 @@ async def agent_response(input_string: str):
                 response = human_messages[-1].content
             checkpoint_tuples.extend([c async for c in checkpointer.alist(config)])
         # print("Checkpoint Tuples:", checkpoint_tuples)
+      
         return response
