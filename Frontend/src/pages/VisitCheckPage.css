@@ -1,12 +1,12 @@
 /* 부모 컨테이너 스타일 */
 .visit-check-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  /* 화면 크기에 따라 높이 조정 */
-  min-height: 100vh;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  width: 100%;
+  max-width: 1000px; /* 너무 넓어지지 않도록 제한 */
   padding: 2rem;
 }
 
@@ -30,25 +30,55 @@
   justify-content: center;
 }
 
-/* 버튼 공통 스타일 */
+/* 안내문 스타일 */
+.visit-check-container p {
+  font-size: 1.3rem;
+  color: #333;
+  text-align: center;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+/* 3D 버튼 */
 .visit-check-button {
   width: 280px;
-  height: 280px;
+  height: 80px;
+  border: none;
   border-radius: 12px;
   font-size: 1.5rem;
-  font-weight: bold;
+  font-weight: 700;
+  color: white;
+  background: #007bff;
   cursor: pointer;
-
-  /* 키오스크에서도 누르기 편하도록 여백과 테두리 지정 */
-  padding: 1rem;
-  border: none;
-
-  /* 시각적 효과 */
-  background-color: #007bff;
-  color: #fff;
-  transition: background-color 0.3s ease;
+  box-shadow: 0px 6px 0px #0056b3, 0px 12px 20px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease-in-out;
 }
 
 .visit-check-button:hover {
-  background-color: #0056b3; /* 마우스 오버 시 색상변경 */
+  background: #0056b3;
+}
+
+.visit-check-button:active {
+  transform: translateY(4px);
+  box-shadow: 0px 3px 0px #0056b3, 0px 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.visit-check-button:focus {
+  outline: none; /* 클릭 시 생기는 테두리 제거 */
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .visit-check-container h1 {
+    font-size: 1.8rem;
+  }
+
+  .visit-check-container p {
+    font-size: 1.1rem;
+  }
+
+  .visit-check-button {
+    width: 100%;
+    max-width: 250px;
+  }
 }

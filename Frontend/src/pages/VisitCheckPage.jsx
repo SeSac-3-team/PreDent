@@ -1,12 +1,14 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import "./VisitCheckPage.css";
 
 const VisitCheckPage = ({ onSelect }) => {
   // onSelect 함수를 통해 클릭된 타입('new' or 'existing')을 부모에게 전달
-  // 추후 다른 페이지로 이동할 경우 react-router-dom의 useNavigate 등을 사용할 수 있음
+  const navigate = useNavigate();
+
   const handleNewPatient = () => {
     if (onSelect) onSelect("new");
-    // 예) navigate('/new-patient-form');
+    navigate("/info");
   };
 
   const handleExistingPatient = () => {

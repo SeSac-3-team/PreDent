@@ -24,10 +24,16 @@ function Sidebar() {
 
       <nav className="sidebar-menu">
         <Link to="/" className="menu-item">
-          사용자 정보 입력
+          환자 방문 이력 확인
+        </Link>
+        <Link to="/info" className="menu-item">
+          초진환자 정보 입력
+        </Link>
+        <Link to="/info" className="menu-item">
+          재진환자 정보 입력
         </Link>
         <Link to="/chat" className="menu-item">
-          대화 시작
+          사전문진 시작
         </Link>
       </nav>
     </div>
