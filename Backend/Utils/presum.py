@@ -21,6 +21,10 @@ def get_presum(query: str) -> dict:
             description="환자의 증상과 관련된 가능성이 높은 질환 3가지를 콤마(,)로 구분하여 작성합니다."
         ),
         ResponseSchema(
+            name="질환 카테고리",
+            description="환자의 예상 질환을 반영하여여 [충치 질환, 잇몸 질환, 신경 및 치근단 질환, 구강 점막 질환, 교합 및 턱 질환, 치아 손상, 기타] 중 어떤 카테고리에 속하는지 1개만 작성합니다. "
+        ),
+        ResponseSchema(
             name="질환 설명",
             description="각 질환에 대해 쉽게 이해할 수 있도록 설명합니다."
         ),
@@ -32,12 +36,13 @@ def get_presum(query: str) -> dict:
     
     # 2. OutputParser 생성 및 포맷 지시문 획득
     output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
-    format_instructions = output_parser.get_format_instructions()
+    format_instructions = 'The output should be a markdown code snippet formatted in the following schema, including the leading and trailing "```json" and "```"\n출력에는 다음과 같은 key값을 포함하세요. ["예상 질환", "질환 카테고리", "질환 설명", "초기 관리 및 생활 습관 추천"]'
     
     # 3. 시스템 프롬프트 생성 (포맷 지시문 포함)
     system_prompt_text = (
     "당신은 치과 진료의를 돕는 사전 진단 챗봇입니다. 환자가 제공한 증상 정보를 바탕으로 아래의 양식에 맞춰 따뜻하고 친절한 말투로 JSON 형식의 응답을 생성하세요.\n"
-    + format_instructions 
+    + format_instructions +
+    "\n이 중 '질환 카테고리'는 반드시 다음 옵션 중 하나여야 합니다: [충치 질환, 잇몸 질환, 신경 및 치근단 질환, 구강 점막 질환, 교합 및 턱 질환, 치아 손상, 기타]."
     )
 
     print("test1:", system_prompt_text)

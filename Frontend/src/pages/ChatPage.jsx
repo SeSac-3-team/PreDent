@@ -119,7 +119,7 @@ function ChatPage() {
       const response = await fetch(apiUrl);
       if (response.ok) {
         const data = await response.json();
-        return data.presum;
+        return data;
       } else {
         return "API 요청에 실패했습니다.";
       }
@@ -128,12 +128,34 @@ function ChatPage() {
     }
   };
 
-  // 사전진단 렌더링 함수
   const renderAnswers = (answersToRender) => {
+    const diseaseCategory = answersToRender["질환 카테고리"];
+    // public 폴더 내의 assets/images 경로를 기준으로 이미지 URL 구성
+    const imageUrl = `public/assets/images/${diseaseCategory}.jpg`; // 확장자가 jpg라고 가정
+
+    // 텍스트와 이미지를 함께 렌더링하는 JSX 구성
+    const content = (
+      <div>
+        <img src={imageUrl} alt={diseaseCategory} className="customImage" />
+        <p>
+          문진 결과에 따른 귀하의 예상 질환은 {answersToRender["예상 질환"]}{" "}
+          으로 추정됩니다.
+        </p>
+        <p style={{ color: "red" }}>
+          ⚠️ 예상 질환은 참고용이며, 정확한 검사와 치료를 위해 치과 전문의의
+          상담이 꼭 필요합니다.
+        </p>
+        <ReactMarkdown>{answersToRender["질환 설명"]}</ReactMarkdown>
+        <ReactMarkdown>
+          {answersToRender["초기 관리 및 생활 습관 추천"]}
+        </ReactMarkdown>
+      </div>
+    );
+
     setMessages((prev) => [
       ...prev,
       {
-        text: <ReactMarkdown>{answersToRender}</ReactMarkdown>,
+        text: content,
         sender: "bot",
         avatar: "public/images/Doctor_img.png",
       },
@@ -179,7 +201,7 @@ function ChatPage() {
         const data = {
           ...newAnswers,
           vas_scale: vas,
-          pre_diagnosis: pre_res,
+          predicted_disease: pre_res["예상 질환"],
           patid: 1,
         };
 
