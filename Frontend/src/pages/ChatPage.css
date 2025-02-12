@@ -97,6 +97,13 @@
   animation: blink 1s infinite;
 }
 
+.customImage {
+  margin-top: 10px;
+  width: 300px;
+  height: auto;
+  max-width: 100%;
+}
+
 @keyframes blink {
   0% {
     opacity: 1;

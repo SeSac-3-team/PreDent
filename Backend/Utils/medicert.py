@@ -3,7 +3,7 @@ from django.db import connection
 def save_medicert(data):
     # 요청으로 들어온 데이터를 파싱합니다.
     vas_scale = data.get('vas_scale')
-    pre_diagnosis = data.get('pre_diagnosis')
+    predicted_disease = data.get('predicted_disease')
     patid = data.get('patid')
     symptom_description = data.get('증상 내용')
     symptom_duration = data.get('증상 기간')
@@ -15,7 +15,7 @@ def save_medicert(data):
     # 필요한 경우, 데이터를 전처리하거나 로깅할 수 있습니다.
     print(f"""test :
         vas_scale: {vas_scale},
-        pre_diagnosis: {pre_diagnosis},
+        predicted_disease: {predicted_disease},
         patid: {patid},
         symptom_description: {symptom_description},
         symptom_duration: {symptom_duration},
@@ -28,14 +28,14 @@ def save_medicert(data):
     # SQL 쿼리를 사용하여 DB에 저장하는 로직
     query = """
         INSERT INTO medicert 
-        (vas_scale, pre_diagnosis, patid, symptom_description, symptom_duration, symptom_area, tooth_mobility, pain_type, gum_swelling)
+        (vas_scale, predicted_disease, patid, symptom_description, symptom_duration, symptom_area, tooth_mobility, pain_type, gum_swelling)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
 
     with connection.cursor() as cursor:
         cursor.execute(query, [
             vas_scale, 
-            pre_diagnosis,
+            predicted_disease,
             patid,
             symptom_description,
             symptom_duration,

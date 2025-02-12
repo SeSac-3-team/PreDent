@@ -19,7 +19,7 @@ def vas_response(request, input_string):
 
 def presum_response(request, input_string):
 	response = get_presum(input_string)
-	return JsonResponse({'presum' : str(response)})
+	return JsonResponse(response)
 
 @api_view(['POST'])
 def medicert_save(request):
