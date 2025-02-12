@@ -12,7 +12,7 @@ from typing import Literal
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_teddynote.messages import random_uuid
 from typing import Dict, Any
-
+import asyncio
 
 from Utils.sql_agent import sql_node
 from Utils.rag_agent import rag_node
@@ -27,6 +27,7 @@ load_dotenv()
 from langchain_teddynote import logging
 from langchain_teddynote.graphs import visualize_graph
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+from langgraph.graph import Graph
 
 logging.langsmith("LangGraph")
 
@@ -36,6 +37,25 @@ DB_URI = os.getenv("DATABASE_URL")
 async def get_checkpointer():
     async with AsyncPostgresSaver.from_conn_string(DB_URI) as checkpointer:
         return checkpointer
+
+# ✅ 데이터 정리 함수 (오래된 체크포인트 삭제)
+async def cleanup_old_checkpoints():
+    async with AsyncPostgresSaver.from_conn_string(DB_URI) as checkpointer:
+        async with checkpointer.conn.cursor() as cursor:
+            await cursor.execute("""
+                WITH RankedCheckpoints AS (
+    SELECT 
+        checkpoint_id,
+        ROW_NUMBER() OVER (
+            ORDER BY checkpoint_ns DESC, checkpoint_id DESC
+        ) AS rn
+    FROM public.checkpoints
+)
+DELETE FROM public.checkpoints
+USING RankedCheckpoints
+WHERE public.checkpoints.checkpoint_id = RankedCheckpoints.checkpoint_id
+AND RankedCheckpoints.rn > 30;
+            """)
 
 # 상태 정의
 class AgentState(TypedDict):
@@ -80,12 +100,8 @@ llm = ChatOpenAI(model="gpt-4o", temperature=0)
 
 # Supervisor Agent 생성
 def supervisor_agent(state):
-
-    # 프롬프트와 LLM을 결합하여 체인 구성
     supervisor_chain = prompt | llm.with_structured_output(RouteResponse)
-    # Agent 호출
     response = supervisor_chain.invoke(state)
-    
     return response
 
 # ✅ LangGraph Workflow 생성
@@ -102,17 +118,16 @@ for member in members:
     if member != "CHATagent":
         workflow.add_edge(member, "Supervisor")
 
-# # ✅ Supervisor가 조건에 따라 다음 Agent 선택
-    conditional_map = {k: k for k in members}
-    conditional_map["FINISH"] = END
+conditional_map = {k: k for k in members}
+conditional_map["FINISH"] = END
 
 def get_next(state):
-    return state["next"]
+    next_agent = state["next"]
+    if next_agent == "FINISH" and not state.get("executed_agents", []):
+        return "CHATagent"
+    return next_agent
 
-# ✅ Supervisor → 다음 Agent (조건부 경로 설정)
 workflow.add_conditional_edges("Supervisor", get_next, conditional_map)
-
-# ✅ 시작점 설정
 workflow.add_edge(START, "Supervisor")
 workflow.add_edge("CHATagent", END)
 
@@ -120,27 +135,23 @@ workflow.add_edge("CHATagent", END)
 async def compile_graph():
     async with AsyncPostgresSaver.from_conn_string(DB_URI) as checkpointer:
         return workflow.compile(checkpointer=checkpointer)
-    
-    
+
 # ✅ 실행 함수 (Supervisor 호출)
 async def agent_response(input_string: str):
+    await cleanup_old_checkpoints()  # ✅ 실행 전 오래된 체크포인트 정리
     async with AsyncPostgresSaver.from_conn_string(DB_URI) as checkpointer:
         graph = workflow.compile(checkpointer=checkpointer)
-    
         img_data = graph.get_graph().draw_mermaid_png()
-        # PNG 파일로 저장
         with open("mermaid_graph.png", "wb") as f:
             f.write(img_data)
- 
-  
-        thread_id = str(random_uuid)  # thread_id를 문자열로 변환
-
+        thread_id = str(1115)
         config = RunnableConfig(recursion_limit=10, configurable={"thread_id": thread_id})
         response = ""
-
+        checkpoint_tuples = []
         async for result in graph.astream({"messages": [HumanMessage(content=input_string)], "executed_agents": []}, config=config):
             human_messages = [msg for node in result.values() for msg in node.get("messages", []) if isinstance(msg, HumanMessage)]
             if human_messages:
-                response = human_messages[-1].content  # 최종 응답 저장
-
+                response = human_messages[-1].content
+            checkpoint_tuples.extend([c async for c in checkpointer.alist(config)])
+        # print("Checkpoint Tuples:", checkpoint_tuples)
         return response

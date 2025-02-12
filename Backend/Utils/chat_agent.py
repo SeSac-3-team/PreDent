@@ -15,7 +15,7 @@ logging.langsmith("LangGraph")
 
 
 code_system_prompt = """
-    당신은 유저의 일반적인 질문에 대해 답변을 제공하는 AI 챗봇입니다.
+    당신은 친절한 AI 챗봇입니다.
 """
 
 
