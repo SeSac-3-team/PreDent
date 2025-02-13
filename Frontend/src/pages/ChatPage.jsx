@@ -129,46 +129,155 @@ function ChatPage() {
 
   const renderAnswers = (answersToRender) => {
     const diseaseCategory = answersToRender["질환 카테고리"];
+    const diseaseArea = answersToRender["증상 위치"];
     // public 폴더 내의 assets/images 경로를 기준으로 이미지 URL 구성
     const imageUrlVAS = `public/assets/VASimages/${vas}.jpg`; // 확장자가 jpg라고 가정
     const imageUrlDC = `public/assets/DCimages/${diseaseCategory}.jpg`; // 확장자가 jpg라고 가정
+    const imageUrlArea = `public/assets/Areaimages/${diseaseArea}.jpg`; // 확장자가 jpg라고 가정
 
     // 텍스트와 이미지를 함께 렌더링하는 JSX 구성
     const content = (
-      <div>
+      <div
+        style={{
+          maxWidth: "800px",
+          margin: "0 auto",
+          padding: "20px",
+          fontFamily: "Arial, sans-serif",
+        }}
+      >
+        <h2
+          style={{
+            textAlign: "center",
+            fontSize: "26px", // 과하지 않은 크기
+            fontWeight: "600", // 너무 두껍지 않게
+            marginBottom: "15px",
+            padding: "12px",
+            color: "#34495e", // 차분한 다크 네이비
+            background: "#f4f6f7", // 너무 밝지 않은 뉴트럴 톤 배경
+            borderRadius: "8px", // 살짝 둥글게
+            boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.05)", // 그림자 최소화
+            letterSpacing: "0.5px", // 가독성 향상
+          }}
+        >
+          📝 사전진단서
+        </h2>
+
+        {/* 경고 문구 위치 이동 */}
+        <p
+          style={{
+            color: "red",
+            fontWeight: "bold",
+            textAlign: "center",
+            marginBottom: "20px",
+            fontSize: "16px",
+          }}
+        >
+          ⚠️ 예상 질환은 참고용일 뿐이며, 정확한 검사와 치료를 위해 치과
+          전문의의 상담이 꼭 필요합니다.
+        </p>
+
         <img
           src={imageUrlVAS}
           alt={vas}
           style={{
-            width: "100%", // 전체 가로폭 차지
+            width: "100%",
             height: "auto",
-            display: "block", // block 요소로 만들어 margin 적용 가능
-            marginBottom: "20px", // 이미지 아래에 여백 추가
+            display: "block",
+            marginBottom: "20px",
+            borderRadius: "8px",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
           }}
         />
-        <div style={{ display: "flex", alignItems: "flex-start" }}>
-          <img
-            src={imageUrlDC}
-            alt={diseaseCategory}
+
+        {/* 첫 번째 행: 왼쪽 - imageUrlDC, 오른쪽 - 예상 질환 텍스트 */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            flexWrap: "nowrap", // 한 줄에 고정
+            alignItems: "center",
+            marginBottom: "20px",
+          }}
+        >
+          <div
             style={{
-              width: "200px", // 원하는 크기로 조정 (필요시 값 변경)
-              height: "auto",
-              marginRight: "20px", // 텍스트와의 간격 확보
+              flex: "0 0 200px", // 고정 너비 200px
+              marginRight: "20px",
             }}
-          />
-          <div>
+          >
+            <img
+              src={imageUrlDC}
+              alt={diseaseCategory}
+              style={{
+                width: "100%",
+                height: "auto",
+                borderRadius: "8px",
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+              }}
+            />
+          </div>
+          <div
+            style={{
+              flex: "1",
+              lineHeight: "1.6",
+              fontSize: "16px",
+            }}
+          >
             <p>
-              문진 결과에 따른 귀하의 예상 질환은 {answersToRender["예상 질환"]}{" "}
-              으로 추정됩니다.
-            </p>
-            <p style={{ color: "red" }}>
-              ⚠️ 예상 질환은 참고용이며, 정확한 검사와 치료를 위해 치과 전문의의
-              상담이 꼭 필요합니다.
+              귀하의 문진 결과에 따라 일반적으로 예상되는 질환은{" "}
+              <strong>{answersToRender["예상 질환"]}</strong> 으로 추정됩니다.
             </p>
             <ReactMarkdown>{answersToRender["질환 설명"]}</ReactMarkdown>
+          </div>
+        </div>
+
+        {/* 두 번째 행: 왼쪽 - 질환 설명 등 텍스트, 오른쪽 - imageUrlArea */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            flexWrap: "nowrap", // 한 줄에 고정
+            alignItems: "center",
+          }}
+        >
+          <div
+            style={{
+              flex: "1",
+              lineHeight: "1.6",
+              fontSize: "16px",
+              marginRight: "20px",
+            }}
+          >
             <ReactMarkdown>
               {answersToRender["초기 관리 및 생활 습관 추천"]}
             </ReactMarkdown>
+            <p style={{ color: "blue", fontWeight: "bold" }}>
+              👨‍⚕️ 진료 시 전문의가 직접 상태를 세심하게 살펴본 뒤 환자분께 꼭
+              맞는 치료 방법을 안내해 드릴 테니 편안한 마음으로 상담 받아보세요!
+              🦷
+            </p>
+          </div>
+          <div style={{ flex: "0 0 200px", textAlign: "center" }}>
+            <p
+              style={{
+                color: "skyblue",
+                fontSize: "18px",
+                fontWeight: "bold",
+                marginBottom: "8px",
+              }}
+            >
+              증상 발생 위치
+            </p>
+            <img
+              src={imageUrlArea}
+              alt={diseaseArea}
+              style={{
+                width: "100%",
+                height: "auto",
+                borderRadius: "8px",
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+              }}
+            />
           </div>
         </div>
       </div>
@@ -178,8 +287,7 @@ function ChatPage() {
       ...prev,
       {
         text: content,
-        sender: "bot",
-        avatar: "public/images/Doctor_img.png",
+        sender: "pre",
       },
     ]);
   };
@@ -385,7 +493,13 @@ function ChatPage() {
         {messages.map((msg, index) => (
           <div
             key={index}
-            className={`chat-message ${msg.sender === "user" ? "user" : "bot"}`}
+            className={`chat-message ${
+              msg.sender === "user"
+                ? "user"
+                : msg.sender === "bot"
+                ? "bot"
+                : "pre"
+            }`}
           >
             {msg.sender === "bot" && (
               <img src={msg.avatar} alt="Bot" className="chat-avatar" />
