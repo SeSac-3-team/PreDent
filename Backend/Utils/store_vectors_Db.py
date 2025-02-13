@@ -7,7 +7,7 @@ from langchain_openai import OpenAIEmbeddings
 from dotenv import load_dotenv
 
 # 환경 변수 로드
-load_dotenv()
+load_dotenv(dotenv_path="myapp/.env")
 
 # OpenAI API 키 설정
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")

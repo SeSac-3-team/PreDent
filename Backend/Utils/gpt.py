@@ -21,7 +21,7 @@ from Utils.chat_agent import chat_node  # ✅ 일반적인 질문에 답변하�
 # ✅ Load environment variables
 import os
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv(dotenv_path="myapp/.env")
 
 # ✅ Initialize memory checkpointing
 from langchain_teddynote import logging
@@ -118,22 +118,24 @@ async def compile_graph():
     async with AsyncPostgresSaver.from_conn_string(DB_URI) as checkpointer:
         return workflow.compile(checkpointer=checkpointer)
 
+patid=1
 # ✅ 실행 함수 (Supervisor 호출)
 async def agent_response(input_string: str):
     async with AsyncPostgresSaver.from_conn_string(DB_URI) as checkpointer:
+        real_input_string = input_string + f'\n질문하는 환자의 patid는 {patid}입니다.'
         graph = workflow.compile(checkpointer=checkpointer)
         img_data = graph.get_graph().draw_mermaid_png()
         with open("mermaid_graph.png", "wb") as f:
             f.write(img_data)
-        thread_id = str(random_uuid())
+        thread_id = str(random_uuid)
         config = RunnableConfig(recursion_limit=10, configurable={"thread_id": thread_id})
         response = ""
         checkpoint_tuples = []
-        async for result in graph.astream({"messages": [HumanMessage(content=input_string)], "executed_agents": []}, config=config):
+        async for result in graph.astream({"messages": [HumanMessage(content=real_input_string)], "executed_agents": []}, config=config):
             human_messages = [msg for node in result.values() for msg in node.get("messages", []) if isinstance(msg, HumanMessage)]
             if human_messages:
                 response = human_messages[-1].content
             checkpoint_tuples.extend([c async for c in checkpointer.alist(config)])
         # print("Checkpoint Tuples:", checkpoint_tuples)
-      
+    
         return response

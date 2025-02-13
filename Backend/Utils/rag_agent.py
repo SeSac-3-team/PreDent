@@ -10,7 +10,7 @@ from langchain_teddynote import logging
 from Utils.store_vectors_Db import vectorstore
 
 # 환경 변수 로드
-load_dotenv()
+load_dotenv(dotenv_path="myapp/.env")
 
 logging.langsmith("LangGraph")
 

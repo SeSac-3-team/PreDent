@@ -10,7 +10,7 @@ import functools
 from langgraph.prebuilt import create_react_agent
 
 
-load_dotenv()
+load_dotenv(dotenv_path="myapp/.env")
 logging.langsmith("LangGraph")
 
 

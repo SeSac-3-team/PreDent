@@ -1,117 +1,22 @@
-/* ChatPage.css */
-
+/* src/pages/ChatPage.css */
 .chat-page-container {
-  width: 100%;
-  height: 80vh;
   display: flex;
   flex-direction: column;
+  height: 90vh; /* 뷰포트 전체 높이 */
+  width: 82vw;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
-.chat-window {
-  display: flex;
-  flex-direction: column;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  background-color: #ffffff;
-  padding: 1rem;
-  overflow: auto;
-  border-radius: 4px;
-  margin-bottom: 1rem;
+.chat-page-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
 }
 
-/* 메시지 스타일 */
-.chat-message {
-  margin-bottom: 0.5rem;
-  max-width: 70%;
-  padding: 0.5rem;
-  border-radius: 6px;
-  line-height: 1.4;
-  word-wrap: break-word;
-  white-space: pre-space;
-  word-wrap: break-word;
-}
-
-/* 사용자 메시지 - 파랑 배경, 흰색 글씨 */
-.chat-message.user {
-  background-color: #006bff;
-  color: #fff;
-  align-self: flex-end;
-}
-
-/* 봇 메시지 - 흰색 배경, 검정 텍스트 */
-.chat-message.bot {
-  background-color: #fff;
-  color: #333;
-  border: 1px solid #ddd;
-  align-self: flex-start;
-}
-
-/* 의사 이미지 채팅 아바타 설정 */
-.chat-avatar {
-  width: 60px; /* 이미지 크기 조절 */
-  height: 60px;
-  margin-right: 10px; /* 메시지와의 간격 조절 */
-  border-radius: 50%; /* 원형 이미지 */
-  flex-direction: row; /* 봇 메시지 아바타를 왼쪽으로 이동 */
-}
-
-/* 입력 영역 */
-.chat-input {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.chat-input input {
-  flex: 1;
-  padding: 0.5rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  background-color: #f2f2f2;
-  color: #000;
-}
-
-.chat-input button {
-  background-color: #006aff;
-  color: #fff;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.chat-input button:hover {
-  background-color: #0056cc;
-}
-
-.recording-indicator {
-  margin-top: 1rem;
-  color: red;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-}
-
-.recording-indicator span {
-  margin-right: 0.5rem;
-  animation: blink 1s infinite;
-}
-
-.customImage {
+.stt-result {
   margin-top: 10px;
-  width: 300px;
-  height: auto;
-  max-width: 100%;
-}
-
-@keyframes blink {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.2;
-  }
-  100% {
-    opacity: 1;
-  }
+  background-color: #fafafa;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
