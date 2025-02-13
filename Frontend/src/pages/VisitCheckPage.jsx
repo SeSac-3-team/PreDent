@@ -13,7 +13,7 @@ const VisitCheckPage = ({ onSelect }) => {
 
   const handleExistingPatient = () => {
     if (onSelect) onSelect("existing");
-    // 예) navigate('/returning-patient-form');
+    navigate("/re_info");
   };
 
   return (

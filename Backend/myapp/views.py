@@ -9,6 +9,12 @@ import asyncio
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from Utils.update_patient_info import update_patient_info
+from Utils.get_existing_patient import get_existing_patient
+from django.middleware.csrf import get_token
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import ensure_csrf_cookie
+import json
 
 load_dotenv(dotenv_path="myapp/.env")
 # Create your views here.
@@ -43,3 +49,25 @@ def save_patient(request):
         return Response({"message": "데이터 저장 성공"}, status=status.HTTP_201_CREATED)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+@api_view(['POST','PATCH'])
+def update_patient(request):
+    data = request.data
+    try:
+        update_patient_info(data)
+        return Response({"message": "데이터 업데이트 성공"}, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+@api_view(['POST'])
+def existing_patient_view(request):
+    try:
+        response = get_existing_patient(request._request)  # utils 폴더의 함수 호출
+        return response  # JSON 응답 반환
+    except json.JSONDecodeError:
+        return Response({"error": "Invalid JSON format"}, status=status.HTTP_400_BAD_REQUEST)
+    
+@ensure_csrf_cookie
+def csrf_token_view(request):
+    return JsonResponse({"csrfToken": get_token(request)})
+

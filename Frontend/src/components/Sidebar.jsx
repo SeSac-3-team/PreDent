@@ -29,7 +29,7 @@ function Sidebar() {
         <Link to="/info" className="menu-item">
           초진환자 정보 입력
         </Link>
-        <Link to="/info" className="menu-item">
+        <Link to="/re_info" className="menu-item">
           재진환자 정보 입력
         </Link>
         <Link to="/chat" className="menu-item">

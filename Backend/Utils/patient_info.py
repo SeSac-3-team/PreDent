@@ -43,4 +43,3 @@ def patient_info(data):
             agree,
             patbirth,
         ])
-

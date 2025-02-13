@@ -18,7 +18,7 @@ import PreDiagnosisReport from "../components/PreDiagnosisReport";
 function ChatPage() {
   // 1. 진입 목적에 따른 모드 설정 (치료 vs 단순 채팅)
   const location = useLocation();
-  const purpose = location.state?.purpose || "";
+  const { patid, purpose } = location.state || {};
   const isSimpleChat = purpose !== "치료";
 
   // 2. 설문/문진 관련 상태들
@@ -255,7 +255,7 @@ function ChatPage() {
           ...newAnswers,
           vas_scale: vas,
           predicted_disease: pre_res["예상 질환"],
-          patid: 1,
+          patid: patid, // 전달받은 patid 사용
         };
 
         axios

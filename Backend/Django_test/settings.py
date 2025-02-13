@@ -60,7 +60,9 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS').split(',')
+
+CORS_ALLOW_CREDENTIALS = True  # ✅ CSRF 쿠키 및 인증 관련 요청 허용, 배포시 확인 필요
 
 ROOT_URLCONF = "Django_test.urls"
 
