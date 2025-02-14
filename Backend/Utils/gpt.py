@@ -1,139 +1,217 @@
-from langgraph.graph import StateGraph, START, END
-from langchain_openai import ChatOpenAI
-from langchain_core.messages import HumanMessage
-from langchain_core.runnables import RunnableConfig
-from langchain_core.messages import BaseMessage
-import operator
-from typing import Sequence, Annotated, List
+from typing import Literal, Sequence
+from urllib import response
 from typing_extensions import TypedDict
-from pydantic import BaseModel
-from typing import Literal
 
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_teddynote.messages import random_uuid
-from typing import Dict, Any
-import asyncio
-
-from Utils.sql_agent import sql_node
-from Utils.rag_agent import rag_node
-from Utils.chat_agent import chat_node  # ✅ 일반적인 질문에 답변하는 Agent 추가
-
-# ✅ Load environment variables
 import os
-from dotenv import load_dotenv
-load_dotenv()
 
-# ✅ Initialize memory checkpointing
-from langchain_teddynote import logging
-from langchain_teddynote.graphs import visualize_graph
-from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
-from langgraph.graph import Graph
+from langgraph.graph import MessagesState, END
+from langgraph.types import Command 
+from langchain_core.messages import SystemMessage, RemoveMessage
+from langgraph.checkpoint.memory import MemorySaver
+from langgraph.graph import MessagesState, StateGraph, START, END
+from langchain_core.messages import HumanMessage
 
-logging.langsmith("LangGraph")
+from langchain_openai import ChatOpenAI
+
+from psycopg_pool import ConnectionPool
+from langgraph.checkpoint.postgres import PostgresSaver
+
+from Utils.sql_agent import sql_agent
+from Utils.rag_agent import rag_agent
+from Utils.chat_agent import chat_agent
+
+# memory = MemorySaver()
 
 DB_URI = os.getenv("DATABASE_URL")
+# We will add a `summary` attribute (in addition to `messages` key,
+# which MessagesState already has)
+class State(MessagesState):
+    summary: str
+    next: str
+    excuted_agents: Sequence[str]
 
-# ✅ PostgreSQL 기반 체크포인트 저장소 초기화
-async def get_checkpointer():
-    async with AsyncPostgresSaver.from_conn_string(DB_URI) as checkpointer:
-        return checkpointer
+connection_kwargs = {
+    "autocommit": True,
+    "prepare_threshold": 0,
+}
+
+pool = ConnectionPool(
+    conninfo=DB_URI,
+    max_size=20,
+    kwargs=connection_kwargs,
+)
 
 
-# 상태 정의
-class AgentState(TypedDict):
-    messages: Annotated[Sequence[BaseMessage], operator.add]  # 메시지
-    next: str  # 다음으로 라우팅할 에이전트
+checkpointer = PostgresSaver(pool)
+checkpointer.setup()
 
-# ✅ 멤버 Agent 목록 정의
-members = ["SQLagent", "RAGagent","CHATagent" ]
-options_for_next = ["FINISH"] + members  # FINISH 포함
+# We will use this model for both the conversation and the summarization
+model = ChatOpenAI(model="gpt-4o")
+supervisor_model = ChatOpenAI(model="gpt-4o", temperature=0)
 
-# ✅ Supervisor의 응답 모델 (RouteResponse)
-class RouteResponse(BaseModel):  
-    next: Literal[*options_for_next]  # 다음 실행할 Agent
 
-# ✅ Define system prompt
+members = ["SQLnode", "RAGnode","CHATnode"]
+options = members + ["FINISH"]
+
 system_prompt = (
     "You are a supervisor tasked with managing a conversation between the"
-    " following workers: {members}. Given the following user request,"
-    " classify the intent as one of the following:"
+    f" following workers: {members}. Given the following user request,"
+    " respond with the worker to act next. Each worker will perform a"
+    " task and respond with their results and status."
     " - If the request is related to patient information, choose SQLagent."
     " - If the request is related to cost, choose RAGagent."
     " - If the request requires retrieving patient information before answering a cost-related question, first choose SQLagent, then choose RAGagent."
     " - If the request is a general inquiry, choose CHATagent."
-    " You must select at least one agent before finishing."
+    " When finished, respond with FINISH."
 )
 
-# ✅ ChatPromptTemplate 생성
-prompt = ChatPromptTemplate.from_messages(
-    [
-        ("system", system_prompt),
-        MessagesPlaceholder(variable_name="messages"),
-        (
-            "system",
-            "Given the conversation above, who should act next? "
-            "Or should we FINISH? Select one of: {options}. After at least one agent has acted, you may select FINISH.",
-        ),
-    ]
-).partial(options=str(options_for_next), members=", ".join(members))
+class Router(TypedDict):
+    """Worker to route to next. If no workers needed, route to FINISH."""
 
-# ✅ LLM Initialization
-llm = ChatOpenAI(model="gpt-4o", temperature=0)
+    next: Literal[*options]
 
-# Supervisor Agent 생성
-def supervisor_agent(state):
-    supervisor_chain = prompt | llm.with_structured_output(RouteResponse)
-    response = supervisor_chain.invoke(state)
-    return response
 
-# ✅ LangGraph Workflow 생성
-workflow = StateGraph(AgentState)
+def supervisor_node(state: State) -> Command[Literal[*members, "__end__"]]:
+ 
+    
+    messages = [
+        {"role": "system", "content": system_prompt},
+    ] + state["messages"]
+    response = supervisor_model.with_structured_output(Router).invoke(messages)
+    goto = response["next"]
 
-# ✅ Define Nodes
-workflow.add_node("SQLagent", sql_node)
-workflow.add_node("RAGagent", rag_node)
-workflow.add_node("CHATagent", chat_node)  # ✅ 일반적인 질문을 위한 Agent 추가
-workflow.add_node("Supervisor", supervisor_agent)
+    if goto == "FINISH" and not state.get("excuted_agents",[]):
+        goto = "CHATnode"
+    elif goto == "FINISH":
+        goto = END
 
-# ✅ Agent → Supervisor 이동
-for member in members:
-    if member != "CHATagent":
-        workflow.add_edge(member, "Supervisor")
+    return Command(goto=goto, update={"next": goto})
 
-conditional_map = {k: k for k in members}
-conditional_map["FINISH"] = END
+def sql_node(state: State) -> Command[Literal["supervisor"]]:
+    result = sql_agent.invoke(state)
+    return Command(
+        update={
+            "messages": [
+                HumanMessage(content=result["messages"][-1].content, name="SQLnode")
+            ],
+             "excuted_agents": [str(sql_node)]
+        },
+        goto="supervisor",
+    )
 
-def get_next(state):
-    next_agent = state["next"]
-    if next_agent == "FINISH" and not state.get("executed_agents", []):
-        return "CHATagent"
-    return next_agent
+def rag_node(state: State) -> Command[Literal["supervisor"]]:
+    result = rag_agent.invoke(state)
+    return Command(
+        update={
+            "messages": [
+                HumanMessage(content=result["messages"][-1].content, name="RAGnode")
+            ],
+            "excuted_agents": [str(rag_node)]
+        },
+        goto="supervisor",
+    )
 
-workflow.add_conditional_edges("Supervisor", get_next, conditional_map)
-workflow.add_edge(START, "Supervisor")
-workflow.add_edge("CHATagent", END)
+def chat_node(state: State) -> Command[Literal[END]]:
+    result = chat_agent.invoke(state)
+    return Command(
+        update={
+            "messages": [
+                HumanMessage(content=result["messages"][-1].content, name="CHATnode")
+            ]
+            
+        },
+        goto=END,
+    )
 
-# ✅ 그래프 컴파일 (PostgreSQL 체크포인트 적용)
-async def compile_graph():
-    async with AsyncPostgresSaver.from_conn_string(DB_URI) as checkpointer:
-        return workflow.compile(checkpointer=checkpointer)
 
-# ✅ 실행 함수 (Supervisor 호출)
-async def agent_response(input_string: str):
-    async with AsyncPostgresSaver.from_conn_string(DB_URI) as checkpointer:
-        graph = workflow.compile(checkpointer=checkpointer)
-        img_data = graph.get_graph().draw_mermaid_png()
-        with open("mermaid_graph.png", "wb") as f:
-            f.write(img_data)
-        thread_id = str(random_uuid())
-        config = RunnableConfig(recursion_limit=10, configurable={"thread_id": thread_id})
-        response = ""
-        checkpoint_tuples = []
-        async for result in graph.astream({"messages": [HumanMessage(content=input_string)], "executed_agents": []}, config=config):
-            human_messages = [msg for node in result.values() for msg in node.get("messages", []) if isinstance(msg, HumanMessage)]
-            if human_messages:
-                response = human_messages[-1].content
-            checkpoint_tuples.extend([c async for c in checkpointer.alist(config)])
-        # print("Checkpoint Tuples:", checkpoint_tuples)
-      
-        return response
+def summarize_conversation(state: State):
+    """
+    대화 상태를 확인하여 메시지 수가 6개를 초과하면 대화를 요약하고,
+    그렇지 않으면 END를 반환합니다.
+    """
+    messages = state["messages"]
+
+    # 메시지가 6개보다 많으면 대화를 요약합니다.
+    if len(messages) > 6:
+        # 기존 요약이 있는지 확인합니다.
+        summary = state.get("summary", "")
+        if summary:
+            # If a summary already exists, we use a different system prompt
+            # to summarize it than if one didn't
+            summary_message = (
+                f"This is summary of the conversation to date: {summary}\n\n"
+                "Extend the summary by taking into account the new messages above:"
+            )
+        else:
+            summary_message = "Create a summary of the conversation above:"
+
+        messages = state["messages"] + [HumanMessage(content=summary_message)]
+        response = model.invoke(messages)
+        # We now need to delete messages that we no longer want to show up
+        # I will delete all but the last two messages, but you can change this
+        delete_messages = [RemoveMessage(id=m.id) for m in state["messages"][:-2]]
+        return {"summary": response.content, "messages": delete_messages}
+        
+    # 메시지가 6개 이하이면 종료합니다.
+    return {"messages": messages}
+
+
+
+# Define a new graph
+workflow = StateGraph(State)
+
+# Define the conversation node and the summarize node
+workflow.add_node("supervisor", supervisor_node)
+workflow.add_node("SQLnode", sql_node)
+workflow.add_node("RAGnode", rag_node)
+workflow.add_node("CHATnode", chat_node)
+
+workflow.add_node("summarize_conversation", summarize_conversation)
+
+# Set the entrypoint as conversation
+workflow.add_edge(START, "summarize_conversation")
+
+# We now add a conditional edge
+
+workflow.add_edge( "summarize_conversation", "supervisor")
+
+
+
+# Finally, we compile it!
+app = workflow.compile(checkpointer=checkpointer)
+
+def print_update(update):
+    for k, v in update.items():
+        # 'messages' 키가 있으면 해당 메시지들을 출력합니다.
+        for m in v.get("messages", []):
+            m.pretty_print()
+        # 'summary' 키가 있으면 출력합니다.
+        if "summary" in v:
+            print(v["summary"])
+
+
+
+img_data = app.get_graph().draw_mermaid_png()
+# PNG 파일로 저장
+with open("mermaid_graph.png", "wb") as f:
+    f.write(img_data)
+
+def agent_response(input_string):
+    
+    
+    config = {"configurable": {"thread_id": "214451"}}
+
+    input_message = HumanMessage(content=input_string)
+    input_message.pretty_print()
+
+    for event in app.stream({"messages": [input_message],"excuted_agents":[]}, config, stream_mode="updates"):
+        print_update(event)
+
+    messages = app.get_state(config).values["messages"]
+
+    # 메시지 목록 반환
+    for message in messages:
+        message.pretty_print()
+    
+
+    return message.content

@@ -10,7 +10,7 @@ from langchain_teddynote import logging
 from Utils.store_vectors_Db import vectorstore
 
 # 환경 변수 로드
-load_dotenv()
+load_dotenv(dotenv_path="myapp/.env")
 
 logging.langsmith("LangGraph")
 
@@ -22,21 +22,6 @@ def search_vectorstore(query: str):
     results = retriever.get_relevant_documents(query)
     return results
 
-code_system_prompt = """
-치과 진료비에 대한 질문을 할떄 반환
-"""
-
 # RAG Agent 생성
-rag_agent = create_react_agent(ChatOpenAI(model="gpt-4o-mini"), tools=[search_vectorstore],state_modifier=code_system_prompt,
-)
+rag_agent = create_react_agent(ChatOpenAI(model="gpt-4o"), tools=[search_vectorstore],name="RAGagent")
 
-rag_node = functools.partial(agent_node, agent=rag_agent, name="RAGagent")
-
-# # 검색 요청 실행
-# rag_node(
-#     {
-#         "messages": [
-#             HumanMessage(content="RAG 검색을 수행하여 임플란트 진료비 알려주세요.")
-#         ]
-#     }
-# )

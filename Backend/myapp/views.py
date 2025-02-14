@@ -32,7 +32,7 @@ def medicert_save(request):
 
 def chatbot_response(request, input_string):
     """Django 뷰 함수 - 사용자의 질문을 받고 응답을 반환"""
-    response = asyncio.run(agent_response(input_string))  # 비동기 함수 실행
+    response = agent_response(input_string) 
     return JsonResponse({'answer': str(response)})
 
 @api_view(['POST'])
