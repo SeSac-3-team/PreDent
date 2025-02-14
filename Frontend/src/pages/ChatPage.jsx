@@ -329,11 +329,6 @@ function ChatPage() {
         stopRecording={stopRecording}
         isTranscribing={isTranscribing}
       />
-      {transcription && (
-        <div className="stt-result">
-          <strong>녹음 결과:</strong> {transcription}
-        </div>
-      )}
     </div>
   );
 }
