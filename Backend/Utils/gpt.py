@@ -3,6 +3,8 @@ from urllib import response
 from typing_extensions import TypedDict
 
 import os
+from dotenv import load_dotenv
+load_dotenv(dotenv_path="myapp/.env")
 
 from langgraph.graph import MessagesState, END
 from langgraph.types import Command 

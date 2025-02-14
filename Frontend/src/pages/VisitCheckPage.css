@@ -1,0 +1,84 @@
+/* 부모 컨테이너 스타일 */
+.visit-check-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  width: 100%;
+  max-width: 1000px; /* 너무 넓어지지 않도록 제한 */
+  padding: 2rem;
+}
+
+/* 제목 스타일 */
+.visit-check-container h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+/* 안내문 스타일 */
+.visit-check-container p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+/* 버튼 그룹 컨테이너 */
+.visit-check-button-group {
+  display: flex;
+  gap: 1rem; /* 버튼 간격 */
+  flex-wrap: wrap; /* 화면이 좁아지면 자동 줄바꿈 */
+  justify-content: center;
+}
+
+/* 안내문 스타일 */
+.visit-check-container p {
+  font-size: 1.3rem;
+  color: #333;
+  text-align: center;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+/* 3D 버튼 */
+.visit-check-button {
+  width: 280px;
+  height: 80px;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  background: #007bff;
+  cursor: pointer;
+  box-shadow: 0px 6px 0px #0056b3, 0px 12px 20px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease-in-out;
+}
+
+.visit-check-button:hover {
+  background: #0056b3;
+}
+
+.visit-check-button:active {
+  transform: translateY(4px);
+  box-shadow: 0px 3px 0px #0056b3, 0px 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.visit-check-button:focus {
+  outline: none; /* 클릭 시 생기는 테두리 제거 */
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .visit-check-container h1 {
+    font-size: 1.8rem;
+  }
+
+  .visit-check-container p {
+    font-size: 1.1rem;
+  }
+
+  .visit-check-button {
+    width: 100%;
+    max-width: 250px;
+  }
+}
