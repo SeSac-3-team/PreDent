@@ -40,6 +40,6 @@
 
 /* 사용자 메시지 박스 배경색 변경 */
 .chat-message.user .chat-text {
-  background-color: #007bff; /* 원하는 파란색 (예: 부트스트랩 primary) */
+  background-color: #007bff; /* 원하는 파란색 */
   color: #fff; /* 텍스트 흰색 */
 }
