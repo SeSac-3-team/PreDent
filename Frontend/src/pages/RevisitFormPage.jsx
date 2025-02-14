@@ -10,7 +10,8 @@ function RevisitFormPage() {
   const [purpose, setPurpose] = useState("");
   const [agree, setAgree] = useState(false);
   const [message, setMessage] = useState("");
-  const [PatientId, setPatientId] = useState(null); // 기존 PID 저장
+  const [PatientId, setPatientId] = useState(null); // 기존 환자 ID 저장
+  const [showNotFoundModal, setShowNotFoundModal] = useState(false); // 초진 환자 모달 노출 여부
 
   const navigate = useNavigate();
 
@@ -26,59 +27,61 @@ function RevisitFormPage() {
       // CSRF 토큰 가져오기
       const csrfToken = await getCsrfToken();
 
-      // 1) 기존 환자 존재 여부 확인
-      const checkData = {
-        name: name,
-        phone: phone,
-      };
+      // 1) 기존 환자 존재 여부 확인 (재진 환자인지 확인)
+      const checkData = { name, phone };
       const checkResponse = await axios.post(
         "http://127.0.0.1:8000/get_existing_patient/",
         checkData,
         {
-          headers: {
-            "X-CSRFToken": csrfToken, // CSRF 토큰 포함
-          },
-          withCredentials: true, // 인증된 요청 허용
+          headers: { "X-CSRFToken": csrfToken },
+          withCredentials: true,
         }
       );
 
       if (checkResponse.data.found) {
-        const PatientId = checkResponse.data.patient_id; // 기존 patid 조회
-        setPatientId(PatientId); // 상태에 저장
+        // 기존 환자인 경우: 환자 ID(PID)를 상태에 저장 후 업데이트
+        const patientId = checkResponse.data.patient_id;
+        setPatientId(patientId);
 
-        // 기존 환자 조회 후 받은 patient_id가 state에 저장되어 있다고 가정
         const updateData = {
-          patient_id: PatientId, // 기존 환자 id
-          // 업데이트할 필드만 포함 (예: 내원 목적, 동의 여부)
+          patient_id: patientId,
           purpose: purpose.trim(),
           agree: agree ? 1 : 0,
         };
 
-        // 내원 목적이 공백이 아니라면 업데이트
+        // 내원 목적이 입력된 경우에만 포함
         if (purpose.trim() !== "") {
           updateData.purpose = purpose.trim();
         }
-        // 동의 여부 최근 동의 갱신
         updateData.agree = agree ? 1 : 0;
 
         await axios.patch("http://127.0.0.1:8000/update_patient/", updateData, {
-          headers: {
-            "X-CSRFToken": csrfToken, //CSRF 토큰 포함
-          },
-          withCredentials: true, // 인증된 요청 허용
+          headers: { "X-CSRFToken": csrfToken },
+          withCredentials: true,
         });
 
         setMessage(
           "기존 환자 정보를 확인/갱신했습니다. 챗봇 페이지로 이동합니다."
         );
-        navigate("/chat", { state: { patid: PatientId, purpose } });
+        navigate("/chat", { state: { patid: patientId, purpose } });
       } else {
-        alert("기존 환자 정보를 찾을 수 없습니다. 다시 입력해주세요.");
+        // DB에 일치하는 환자 정보가 없으면(초진환자 입력) 모달 표시
+        setShowNotFoundModal(true);
       }
     } catch (error) {
       console.error("오류 발생:", error);
       setMessage("데이터 저장 실패(서버 오류)");
     }
+  };
+
+  // 모달에서 "확인" 클릭 시 초진(초기정보 입력) 페이지로 이동
+  const handleModalConfirm = () => {
+    navigate("/info");
+  };
+
+  // 모달에서 "취소" 클릭 시 모달 닫기
+  const handleModalCancel = () => {
+    setShowNotFoundModal(false);
   };
 
   return (
@@ -167,6 +170,25 @@ function RevisitFormPage() {
       </form>
 
       {message && <p>{message}</p>}
+
+      {/* 초진 환자 안내 모달 */}
+      {showNotFoundModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <p>
+              입력하신 정보와 일치하는 환자 기록이 없습니다.
+              <br />
+              초진 환자 정보입니다.
+              <br />
+              초기 환자 정보 입력 페이지로 이동하시겠습니까?
+            </p>
+            <div className="modal-buttons">
+              <button onClick={handleModalConfirm}>확인</button>
+              <button onClick={handleModalCancel}>취소</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

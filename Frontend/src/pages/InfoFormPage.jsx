@@ -1,9 +1,8 @@
-// src/pages/InfoFormPage.jsx
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./InfoFormPage.css";
+import { getCsrfToken } from "../Utils/getCsrfToken";
 
 function InfoFormPage() {
   const [name, setName] = useState("");
@@ -17,7 +16,7 @@ function InfoFormPage() {
 
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!agree) {
@@ -25,7 +24,7 @@ function InfoFormPage() {
       return;
     }
 
-    // 백엔드에서 요구하는 key:value 맞추어 데이터 객체 생성
+    // 사용자가 입력한 모든 데이터를 객체로 생성
     const data = {
       name: name,
       gender: gender,
@@ -36,20 +35,63 @@ function InfoFormPage() {
       agree: agree ? 1 : 0,
     };
 
-    axios
-      .post("http://127.0.0.1:8000/save_patient/", data)
-      .then((response) => {
-        console.log("성공:", response.data);
-        setMessage("데이터 저장 성공!");
-        // 데이터 저장 후 ChatPage로 이동하고, 환자 정보(서비스 선택 값)를 전달합니다.
-        navigate("/chat", { state: { purpose: purpose } });
-      })
-      .catch((error) => {
-        console.error("실패:", error);
-        setMessage("데이터 저장 실패");
-      });
+    try {
+      // CSRF 토큰 가져오기 (필요한 경우)
+      const csrfToken = await getCsrfToken();
+
+      // 1) 이름과 전화번호를 기준으로 기존 환자 조회 (재진환자 여부 확인)
+      const checkResponse = await axios.post(
+        "http://127.0.0.1:8000/get_existing_patient/",
+        { name, phone },
+        {
+          headers: { "X-CSRFToken": csrfToken },
+          withCredentials: true,
+        }
+      );
+
+      if (checkResponse.data.found) {
+        // 기존 환자(PID 존재): 이름, 전화번호를 제외한 나머지 정보를 업데이트
+        const updateData = {
+          patient_id: checkResponse.data.patient_id,
+          gender: gender,
+          birth: birth,
+          address: address,
+          purpose: purpose,
+          agree: agree ? 1 : 0,
+        };
+
+        await axios.patch("http://127.0.0.1:8000/update_patient/", updateData, {
+          headers: { "X-CSRFToken": csrfToken },
+          withCredentials: true,
+        });
+
+        setMessage("기존 환자 정보가 업데이트되었습니다.");
+        // 기존 환자의 PID와 내원 목적을 ChatPage로 전달
+        navigate("/chat", {
+          state: { purpose, patid: checkResponse.data.patient_id },
+        });
+      } else {
+        // 신규 환자: 입력한 정보로 DB에 저장
+        const saveResponse = await axios.post(
+          "http://127.0.0.1:8000/save_patient/",
+          data,
+          {
+            headers: { "X-CSRFToken": csrfToken },
+            withCredentials: true,
+          }
+        );
+        // 신규 생성된 patient_id가 응답에 포함되어 있다고 가정합니다.
+        const newPatientId = saveResponse.data.patient_id;
+        setMessage("신규 환자 정보가 저장되었습니다.");
+        // 신규 환자의 PID와 내원 목적을 ChatPage로 전달
+        navigate("/chat", { state: { purpose, patid: newPatientId } });
+      }
+    } catch (error) {
+      console.error("데이터 저장 실패:", error);
+      setMessage("데이터 저장 실패");
+    }
   };
-  // 사용자 정보 입력란 화면 랜더링
+
   return (
     <div className="info-page-container">
       <h1>진료를 기다리고 계신가요?</h1>

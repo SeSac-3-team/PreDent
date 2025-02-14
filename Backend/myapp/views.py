@@ -42,13 +42,19 @@ def chatbot_response(request, input_string):
     return JsonResponse({'answer': str(response)})
 
 @api_view(['POST'])
-def save_patient(request):
-    data = request.data
-    try:
-        patient_info(data)
-        return Response({"message": "데이터 저장 성공"}, status=status.HTTP_201_CREATED)
-    except Exception as e:
-        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+def save_patient_view(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            new_patient_id = patient_info(data)  # 새로 생성된 PID 받기
+
+            return JsonResponse({
+                "success": True,
+                "patient_id": new_patient_id,
+                "message": "환자 정보가 성공적으로 저장되었습니다."
+            }, status=200)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
     
 @api_view(['POST','PATCH'])
 def update_patient(request):
@@ -62,8 +68,9 @@ def update_patient(request):
 @api_view(['POST'])
 def existing_patient_view(request):
     try:
-        response = get_existing_patient(request._request)  # utils 폴더의 함수 호출
-        return response  # JSON 응답 반환
+        response = get_existing_patient(request)  # request._request 대신 request 사용 권장
+        # 만약 get_existing_patient 내부에서 환자를 찾지 못하면 {found: False}를 반환하도록 수정
+        return response  
     except json.JSONDecodeError:
         return Response({"error": "Invalid JSON format"}, status=status.HTTP_400_BAD_REQUEST)
     

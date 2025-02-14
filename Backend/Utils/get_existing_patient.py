@@ -15,7 +15,8 @@ def get_existing_patient(request):
                 patient = Patient.objects.get(patname=name, patpnum=phone)
                 return JsonResponse({"found": True, "patient_id": patient.patid}, status=200)
             except Patient.DoesNotExist:
-                return JsonResponse({"found": False, "error": "Patient not found"}, status=404)
+                # 환자가 존재하지 않으면 False값 200 상태로 반환
+                return JsonResponse({"found": False}, status=200)
 
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON format"}, status=400)
