@@ -136,10 +136,10 @@ function InfoFormPage() {
 
       <form onSubmit={handleSubmit} className="info-form">
         <div className="form-group">
-          <label>성명</label>
+          <label>이름</label>
           <input
             type="text"
-            placeholder="성명을 입력하세요"
+            placeholder="이름을 입력하세요"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />

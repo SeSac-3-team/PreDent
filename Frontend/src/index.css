@@ -12,7 +12,7 @@ body {
   padding: 0;
   width: 100%;
   height: 100%;
-  /* 스크롤 없이 한 화면에 고정하고 싶다면 */
+  /* 스크롤 없이 한 화면에 고정 */
   overflow: hidden;
 }
 
@@ -52,6 +52,7 @@ button {
 }
 button:hover {
   border-color: #646cff;
+  outline: none;
 }
 button:focus,
 button:focus-visible {

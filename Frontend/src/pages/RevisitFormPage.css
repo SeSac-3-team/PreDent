@@ -2,8 +2,13 @@
 
 /* 페이지 컨테이너 */
 .returning-info-container {
-  width: 100%;
-  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 20px); /* 상하 패딩 20px을 뺌 */
+  width: 80vw;
+  padding: 20px;
+  box-sizing: border-box;
+  margin-top: -50px; /* 원하는 만큼 조정 */
 }
 
 /* 페이지 제목 */

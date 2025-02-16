@@ -2,8 +2,13 @@
 
 /* 페이지 컨테이너 */
 .info-page-container {
-  width: 100%;
-  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 20px); /* 상하 패딩 20px을 뺌 */
+  width: 80vw;
+  padding: 20px;
+  box-sizing: border-box;
+  margin-top: -50px; /* 원하는 만큼 조정 */
 }
 
 .info-form {
@@ -26,6 +31,7 @@
   border-radius: 4px;
   border: 1px solid #ccc;
   box-sizing: border-box;
+  outline: none;
 }
 
 /* 체크박스 */
