@@ -6,9 +6,9 @@ import "./PreDiagnosisReport.css";
 const PreDiagnosisReport = ({ answersToRender, vas }) => {
   const diseaseCategory = answersToRender["질환 카테고리"];
   const diseaseArea = answersToRender["증상 위치"];
-  const imageUrlVAS = `public/assets/VASimages/${vas}.jpg`;
-  const imageUrlDC = `public/assets/DCimages/${diseaseCategory}.jpg`;
-  const imageUrlArea = `public/assets/Areaimages/${diseaseArea}.jpg`;
+  const imageUrlVAS = `/assets/VASimages/${vas}.jpg`;
+  const imageUrlDC = `/assets/DCimages/${diseaseCategory}.jpg`;
+  const imageUrlArea = `/assets/Areaimages/${diseaseArea}.jpg`;
 
   return (
     <div className="pre-diagnosis-container">

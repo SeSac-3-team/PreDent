@@ -1,171 +1,86 @@
 import React from "react";
-
-// Card Component
-export function Card({ children, className }) {
-  return (
-    <div className={`border rounded-lg shadow p-4 bg-white ${className}`}>
-      {children}
-    </div>
-  );
-}
-
-export function CardHeader({ children }) {
-  return <div className="border-b pb-2 text-lg font-bold">{children}</div>;
-}
-
-export function CardContent({ children }) {
-  return <div className="mt-2">{children}</div>;
-}
-
-// Input Component
-export function Input({ type = "text", placeholder, ...props }) {
-  return (
-    <input
-      type={type}
-      placeholder={placeholder}
-      className="border p-2 rounded w-full"
-      {...props}
-    />
-  );
-}
-
-// Textarea Component
-export function Textarea({ placeholder, ...props }) {
-  return (
-    <textarea
-      placeholder={placeholder}
-      className="border p-2 rounded w-full"
-      {...props}
-    />
-  );
-}
-
-// Button Component
-export function Button({ children, onClick, className }) {
-  return (
-    <button
-      className={`bg-blue-500 text-white p-2 rounded ${className}`}
-      onClick={onClick}
-    >
-      {children}
-    </button>
-  );
-}
-
-// Progress Component
-export function Progress({ value, className }) {
-  return (
-    <div className={`w-full bg-gray-200 rounded ${className}`}>
-      <div
-        className="bg-blue-500 h-2 rounded"
-        style={{ width: `${value}%` }}
-      ></div>
-    </div>
-  );
-}
-
-// Badge Component
-export function Badge({ children, className }) {
-  return (
-    <span className={`px-2 py-1 text-sm bg-gray-200 rounded ${className}`}>
-      {children}
-    </span>
-  );
-}
+import "./PatientPrescreening.css";
 
 export default function PatientPrescreening({ patientData }) {
+  if (!patientData) {
+    return <div className="loading-message">Loading patient data...</div>;
+  }
+
+  // 환자 기본 정보와 사전 문진 정보를 구조 분해할당합니다.
   const {
-    mecid,
-    vas_scale,
-    predicted_disease,
     created,
-    patid,
+    patient,
     symptom_description,
-    symptom_duration,
+    vas_scale,
     symptom_area,
+    symptom_duration,
     tooth_mobility,
     pain_type,
     gum_swelling,
   } = patientData;
 
+  const getVasRange = (vas_scale) => {
+    switch (vas_scale) {
+      case "0":
+        return "0~1";
+      case "1":
+        return "2~4";
+      case "2":
+        return "5~7";
+      case "3":
+        return "8~10";
+      default:
+        return "알 수 없음"; // 예외 처리
+    }
+  };
+
   return (
-    <div className="p-6 space-y-6">
-      <Card className="mb-4">
-        <CardHeader>
-          <h2 className="text-xl font-bold">환자 사전문진 정보</h2>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p>
-                <strong>환자 ID:</strong> {patid}
-              </p>
-              <p>
-                <strong>문진 ID:</strong> {mecid}
-              </p>
-              <p>
-                <strong>문진 일자:</strong> {new Date(created).toLocaleString()}
-              </p>
-            </div>
-            <div>
-              <p>
-                <strong>VAS 통증 척도:</strong> {vas_scale} / 10
-              </p>
-              <Progress value={(vas_scale / 10) * 100} className="w-full" />
-              <p>
-                <strong>예측된 질병:</strong> <Badge>{predicted_disease}</Badge>
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="patient-prescreening-container">
+      {/* 상단: 기본 환자 정보 */}
+      <div className="patient-info-card">
+        <h2 className="section-title">환자 정보</h2>
+        <div className="info-item">
+          <strong>문진 시점:</strong> {new Date(created).toLocaleString()}
+        </div>
+        <div className="info-item">
+          <strong>환자 이름:</strong> {patient.patname}
+        </div>
+        <div className="info-item">
+          <strong>환자 성별:</strong> {patient.patgend}
+        </div>
+        <div className="info-item">
+          <strong>생년월일:</strong> {patient.patbirth}
+        </div>
+        <div className="info-item">
+          <strong>내원 목적:</strong> {patient.patpurpose}
+        </div>
+      </div>
 
-      <Card className="mb-4">
-        <CardHeader>
-          <h3 className="text-lg font-semibold">증상 요약</h3>
-        </CardHeader>
-        <CardContent>
-          <p>
-            <strong>주요 증상:</strong> {symptom_description}
-          </p>
-          <p>
-            <strong>증상 부위:</strong> {symptom_area}
-          </p>
-          <p>
-            <strong>증상 지속 기간:</strong> {symptom_duration}
-          </p>
-          <p>
-            <strong>통증 유형:</strong> {pain_type}
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card className="mb-4">
-        <CardHeader>
-          <h3 className="text-lg font-semibold">치주 상태</h3>
-        </CardHeader>
-        <CardContent>
-          <p>
-            <strong>치아 동요도:</strong> {tooth_mobility}
-          </p>
-          <p>
-            <strong>잇몸 부기:</strong> {gum_swelling}
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <h3 className="text-lg font-semibold">진료 메모</h3>
-        </CardHeader>
-        <CardContent>
-          <Textarea
-            placeholder="의사의 메모를 입력하세요..."
-            className="w-full mb-4"
-          />
-          <Button>메모 저장</Button>
-        </CardContent>
-      </Card>
+      {/* 하단: 사전 문진 상세 정보 */}
+      <div className="prescreening-details-card">
+        <h2 className="section-title">사전 문진 정보</h2>
+        <div className="info-item">
+          <strong>증상 설명:</strong> {symptom_description}
+        </div>
+        <div className="info-item">
+          <strong>통증 지수 (VAS):</strong> {getVasRange(vas_scale)}
+        </div>
+        <div className="info-item">
+          <strong>통증 위치:</strong> {symptom_area}
+        </div>
+        <div className="info-item">
+          <strong>증상 기간:</strong> {symptom_duration}
+        </div>
+        <div className="info-item">
+          <strong>치아 흔들림 여부:</strong> {tooth_mobility}
+        </div>
+        <div className="info-item">
+          <strong>통증 상황:</strong> {pain_type}
+        </div>
+        <div className="info-item">
+          <strong>잇몸 붓기 여부:</strong> {gum_swelling}
+        </div>
+      </div>
     </div>
   );
 }

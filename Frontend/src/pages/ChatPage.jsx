@@ -18,7 +18,7 @@ import PreDiagnosisReport from "../components/PreDiagnosisReport";
 function ChatPage() {
   // 1. 진입 목적에 따른 모드 설정 (치료 vs 단순 채팅)
   const location = useLocation();
-  const purpose = location.state?.purpose || "";
+  const { patid, purpose } = location.state || {};
   const isSimpleChat = purpose !== "치료";
 
   // 2. 설문/문진 관련 상태들
@@ -49,7 +49,7 @@ function ChatPage() {
           {
             text: "안녕하세요!😊\n자유롭게 채팅을 이용해보세요!",
             sender: "bot",
-            avatar: "public/images/Doctor_img.png",
+            avatar: "/images/Doctor_img.png",
           },
         ]);
       } else if (questions.length > 0) {
@@ -57,7 +57,7 @@ function ChatPage() {
           {
             text: questions[0],
             sender: "bot",
-            avatar: "public/images/Doctor_img.png",
+            avatar: "/images/Doctor_img.png",
           },
         ]);
       }
@@ -88,9 +88,9 @@ function ChatPage() {
   const renderAnswers = (answersToRender) => {
     const diseaseCategory = answersToRender["질환 카테고리"];
     const diseaseArea = answersToRender["증상 위치"];
-    const imageUrlVAS = `public/assets/VASimages/${vas}.jpg`;
-    const imageUrlDC = `public/assets/DCimages/${diseaseCategory}.jpg`;
-    const imageUrlArea = `public/assets/Areaimages/${diseaseArea}.jpg`;
+    const imageUrlVAS = `/assets/VASimages/${vas}.jpg`;
+    const imageUrlDC = `/assets/DCimages/${diseaseCategory}.jpg`;
+    const imageUrlArea = `/assets/Areaimages/${diseaseArea}.jpg`;
 
     const content = (
       <div
@@ -244,7 +244,7 @@ function ChatPage() {
           {
             text: questions[nextIndex],
             sender: "bot",
-            avatar: "public/images/Doctor_img.png",
+            avatar: "/images/Doctor_img.png",
           },
         ]);
       } else {
@@ -255,7 +255,7 @@ function ChatPage() {
           ...newAnswers,
           vas_scale: vas,
           predicted_disease: pre_res["예상 질환"],
-          patid: 1,
+          patid: patid, // 전달받은 patid 사용
         };
 
         axios
@@ -276,7 +276,7 @@ function ChatPage() {
           {
             text: "사전 문진이 모두 완료되었습니다. 😊자유롭게 채팅을 이용해보세요!",
             sender: "bot",
-            avatar: "public/images/Doctor_img.png",
+            avatar: "/images/Doctor_img.png",
           },
         ]);
       }
@@ -293,7 +293,7 @@ function ChatPage() {
         {
           text: content2,
           sender: "bot",
-          avatar: "public/images/Doctor_img.png",
+          avatar: "/images/Doctor_img.png",
         },
       ]);
     }
@@ -329,11 +329,6 @@ function ChatPage() {
         stopRecording={stopRecording}
         isTranscribing={isTranscribing}
       />
-      {transcription && (
-        <div className="stt-result">
-          <strong>녹음 결과:</strong> {transcription}
-        </div>
-      )}
     </div>
   );
 }

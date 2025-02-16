@@ -1,0 +1,84 @@
+/* DoctPage.css */
+
+/* 글로벌 변수 및 기본 리셋 */
+:root {
+  --primary-color: #000000;
+  --secondary-color: #2ecc71;
+  --background-color: #f4f7f9;
+  --text-color: #333;
+  --border-color: #e0e0e0;
+  --sidebar-bg: #ffffff;
+  --hover-bg: #f0f0f0;
+  --font-family: "Roboto", sans-serif;
+  --container-padding: 1.5rem;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--background-color);
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
+/* 전체 페이지: 사이드바와 메인 영역을 포함 */
+.doctor-page {
+  display: flex;
+  width: 100%;
+  min-height: 100vh; /* 전체 화면 높이를 사용 */
+}
+
+/* 메인 콘텐츠 컨테이너 (사이드바 외의 영역) */
+.doctor-page-container {
+  display: flex;
+  flex-direction: column;
+  height: 90vh; /* 뷰포트 전체 높이 */
+  width: 82vw;
+  margin-left: 20%; /* 사이드바의 너비만큼 여백 추가 */
+  padding: 2rem; /* 내부 패딩 */
+  box-sizing: border-box;
+}
+
+/* 페이지 제목 스타일 */
+.page-title {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+/* 반응형 레이아웃 */
+@media (max-width: 768px) {
+  .doctor-page {
+    flex-direction: column;
+  }
+}
+
+/* 로딩 & 오류 메시지 스타일 */
+.loading,
+.error-message,
+.empty-message {
+  text-align: center;
+  font-size: 1.2rem;
+  margin-top: 20px;
+  color: var(--text-color);
+}
+
+.error-message {
+  color: red;
+  font-weight: bold;
+}
+
+/* 환자 데이터 카드 스타일 */
+.patient-card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}

@@ -1,0 +1,63 @@
+/* 예쁜 폰트 적용 */
+.doct-sidebar {
+  width: 20%; /* 또는 고정 값 min-width: 150px; */
+  min-width: 200px;
+  background-color: #fff;
+  border-right: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  font-family: "Inter", "Noto Sans", "Pretendard", sans-serif;
+
+  /* 화면에 고정 */
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh; /* 전체 높이 차지 */
+  overflow-y: auto; /* 내부 스크롤 가능 */
+  padding: 1rem;
+}
+
+.doct-sidebar:hover {
+  background-color: #fafafa;
+  box-shadow: 4px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.doct-sidebar h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #081b50;
+  text-align: center;
+}
+
+.doct-sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.doct-sidebar li {
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background-color: #f9f9f9;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.doct-sidebar li:hover {
+  background-color: #eef3ff;
+  border-color: #081b50;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 반응형 사이드바 */
+@media (max-width: 768px) {
+  .doct-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #ddd;
+    box-shadow: none;
+  }
+}

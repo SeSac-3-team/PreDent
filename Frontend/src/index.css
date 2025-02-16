@@ -1,18 +1,35 @@
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+/* index.css (예시) */
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* 모든 요소에 box-sizing 적용(선택사항) */
+* {
+  box-sizing: border-box;
 }
 
+/* html, body를 브라우저 뷰포트에 맞춤 */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  /* 스크롤 없이 한 화면에 고정하고 싶다면 */
+  overflow: hidden;
+}
+
+/* body를 flex 컨테이너로 설정하고,
+   가로/세로 가운데 정렬 */
+body {
+  display: flex;
+  align-items: center; /* 수직 중앙 정렬 */
+  justify-content: center; /* 수평 중앙 정렬 */
+
+  /* 원하는 배경색, 폰트 등 지정 */
+  background-color: #242424;
+  color: rgba(255, 255, 255, 0.87);
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+/* 필요한 전역 스타일들 */
 a {
   font-weight: 500;
   color: #646cff;
@@ -20,19 +37,6 @@ a {
 }
 a:hover {
   color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
 }
 
 button {
@@ -54,10 +58,12 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+/* 라이트 모드일 때 */
 @media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
+  html,
+  body {
     background-color: #ffffff;
+    color: #213547;
   }
   a:hover {
     color: #747bff;
@@ -65,4 +71,30 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+/* 전체 레이아웃 컨테이너 */
+.layout {
+  display: flex;
+  width: 100%;
+  height: 100vh; /* 화면 꽉 채우기 */
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow: hidden; /* 가로 스크롤 숨기고 싶다면 */
+}
+
+/* 사이드바 */
+.sidebar {
+  width: 200px; /* 고정 폭이라면 */
+  min-width: 200px; /* 혹은 min-width로 고정 */
+  background-color: #f2f2f2;
+  /* 필요한 스타일 */
+}
+
+/* 메인 컨테이너 */
+.main {
+  flex: 1; /* 남은 공간 모두 차지 */
+  background-color: #fff;
+  /* 필요한 스타일 */
 }
