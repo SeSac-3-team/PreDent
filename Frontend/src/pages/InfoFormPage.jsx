@@ -131,151 +131,159 @@ function InfoFormPage() {
 
   return (
     <div className="info-page-container">
-      <h1>진료를 기다리고 계신가요?</h1>
-      <p>대기시간 동안 챗봇에게 간단한 사전진료를 받아보세요!</p>
+      {/* [추가] 이미지 왼쪽에 배치 */}
+      <div className="info-image-container">
+        <img src="images/tooth_image.png" alt="치아 이미지" />
+      </div>
 
-      <form onSubmit={handleSubmit} className="info-form">
-        <div className="form-group">
-          <label>이름</label>
-          <input
-            type="text"
-            placeholder="이름을 입력하세요"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </div>
+      {/* 정보 입력란(오른쪽) */}
+      <div className="info-content">
+        <h1>진료를 기다리고 계신가요?</h1>
+        <p>대기시간 동안 챗봇에게 간단한 사전진료를 받아보세요!</p>
 
-        <div className="form-group">
-          <label>성별</label>
-          <div style={{ display: "flex", gap: "1rem" }}>
-            <label>
-              <input
-                type="radio"
-                name="gender"
-                value="남"
-                checked={gender === "남"}
-                onChange={(e) => setGender(e.target.value)}
-              />
-              남
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="gender"
-                value="여"
-                checked={gender === "여"}
-                onChange={(e) => setGender(e.target.value)}
-              />
-              여
-            </label>
+        <form onSubmit={handleSubmit} className="info-form">
+          <div className="form-group">
+            <label>이름</label>
+            <input
+              type="text"
+              placeholder="이름을 입력하세요"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
           </div>
-        </div>
 
-        <div className="form-group">
-          <label>휴대폰 번호</label>
-          <input
-            type="text"
-            placeholder="휴대폰 번호를 입력하세요"
-            value={phone}
-            onChange={(e) => {
-              // 숫자만 입력되도록 필터링
-              const filteredValue = e.target.value.replace(/[^0-9]/g, "");
-              setPhone(filteredValue);
-            }}
-            onBlur={handlePhoneBlur}
-          />
-        </div>
-
-        <div className="form-group">
-          <label>생년월일</label>
-          <input
-            type="text"
-            placeholder="생년월일을 입력하세요"
-            value={birth}
-            onChange={(e) => setBirth(e.target.value)}
-            onBlur={handleBirthBlur}
-          />
-        </div>
-
-        <div className="form-group">
-          <label>주소</label>
-          <input
-            type="text"
-            placeholder="주소를 입력하세요"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-          />
-        </div>
-
-        <div className="form-group">
-          <label>내원 목적</label>
-          <div
-            className="purpose-check"
-            style={{ display: "flex", gap: "10rem" }}
-          >
-            <label>
-              <input
-                type="radio"
-                name="purpose"
-                value="치료"
-                checked={purpose === "치료"}
-                onChange={(e) => setPurpose(e.target.value)}
-              />
-              치료
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="purpose"
-                value="미용"
-                checked={purpose === "미용"}
-                onChange={(e) => setPurpose(e.target.value)}
-              />
-              미용
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="purpose"
-                value="교정"
-                checked={purpose === "교정"}
-                onChange={(e) => setPurpose(e.target.value)}
-              />
-              교정
-            </label>
-          </div>
-        </div>
-
-        <div className="form-check">
-          <input
-            type="checkbox"
-            id="agree"
-            checked={agree}
-            onChange={(e) => setAgree(e.target.checked)}
-          />
-          <label htmlFor="agree">
-            [개인정보 보호법]에 의거한 개인정보 수집 및 이용에 동의합니다
-          </label>
-        </div>
-
-        <button type="submit" className="start-button" disabled={!agree}>
-          사전진료 시작
-        </button>
-      </form>
-
-      {message && <p>{message}</p>}
-
-      {/* 필수 정보 미입력 시 표시되는 모달 */}
-      {showEmptyModal && (
-        <div className="modal">
-          <div className="modal-content">
-            <p>환자 정보를 확인해주세요</p>
-            <div className="modal-buttons">
-              <button onClick={() => setShowEmptyModal(false)}>확인</button>
+          <div className="form-group">
+            <label>성별</label>
+            <div style={{ display: "flex", gap: "1rem" }}>
+              <label>
+                <input
+                  type="radio"
+                  name="gender"
+                  value="남"
+                  checked={gender === "남"}
+                  onChange={(e) => setGender(e.target.value)}
+                />
+                남
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="gender"
+                  value="여"
+                  checked={gender === "여"}
+                  onChange={(e) => setGender(e.target.value)}
+                />
+                여
+              </label>
             </div>
           </div>
-        </div>
-      )}
+
+          <div className="form-group">
+            <label>휴대폰 번호</label>
+            <input
+              type="text"
+              placeholder="휴대폰 번호를 입력하세요"
+              value={phone}
+              onChange={(e) => {
+                // 숫자만 입력되도록 필터링
+                const filteredValue = e.target.value.replace(/[^0-9]/g, "");
+                setPhone(filteredValue);
+              }}
+              onBlur={handlePhoneBlur}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>생년월일</label>
+            <input
+              type="text"
+              placeholder="생년월일을 입력하세요"
+              value={birth}
+              onChange={(e) => setBirth(e.target.value)}
+              onBlur={handleBirthBlur}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>주소</label>
+            <input
+              type="text"
+              placeholder="주소를 입력하세요"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>내원 목적</label>
+            <div
+              className="purpose-check"
+              style={{ display: "flex", gap: "10rem" }}
+            >
+              <label>
+                <input
+                  type="radio"
+                  name="purpose"
+                  value="치료"
+                  checked={purpose === "치료"}
+                  onChange={(e) => setPurpose(e.target.value)}
+                />
+                치료
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="purpose"
+                  value="미용"
+                  checked={purpose === "미용"}
+                  onChange={(e) => setPurpose(e.target.value)}
+                />
+                미용
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="purpose"
+                  value="교정"
+                  checked={purpose === "교정"}
+                  onChange={(e) => setPurpose(e.target.value)}
+                />
+                교정
+              </label>
+            </div>
+          </div>
+
+          <div className="form-check">
+            <input
+              type="checkbox"
+              id="agree"
+              checked={agree}
+              onChange={(e) => setAgree(e.target.checked)}
+            />
+            <label htmlFor="agree">
+              [개인정보 보호법]에 의거한 개인정보 수집 및 이용에 동의합니다
+            </label>
+          </div>
+
+          <button type="submit" className="start-button" disabled={!agree}>
+            사전진료 시작
+          </button>
+        </form>
+
+        {message && <p>{message}</p>}
+
+        {/* 필수 정보 미입력 시 표시되는 모달 */}
+        {showEmptyModal && (
+          <div className="modal">
+            <div className="modal-content">
+              <p>환자 정보를 확인해주세요</p>
+              <div className="modal-buttons">
+                <button onClick={() => setShowEmptyModal(false)}>확인</button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

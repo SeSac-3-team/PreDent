@@ -1,30 +1,41 @@
 /* RevisitFormPage.css */
 
 /* 페이지 컨테이너 */
-.returning-info-container {
+.revisit-info-container {
+  /* [추가] 가로 레이아웃: 좌측=이미지, 우측=재진 정보 */
   display: flex;
-  flex-direction: column;
-  height: calc(100vh - 20px); /* 상하 패딩 20px을 뺌 */
+  flex-direction: row;
+
+  /* 기존 스타일 유지 */
   width: 80vw;
+  height: calc(100vh - 20px);
   padding: 20px;
   box-sizing: border-box;
-  margin-top: -50px; /* 원하는 만큼 조정 */
 }
 
-/* 페이지 제목 */
-.returning-info-container h1 {
-  text-align: center;
-  margin-bottom: 1rem;
+/* [추가] 좌측 이미지 컨테이너 */
+.revisit-info-image-container {
+  flex: 0 0 40%; /* 원하는 비율로 조정 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-/* 페이지 안내문 */
-.returning-info-container p {
-  text-align: center;
-  margin-bottom: 2rem;
+.revisit-info-image-container img {
+  max-width: 90%; /* 이미지 크기 제한 */
+  height: auto;
 }
 
-/* 폼 스타일 */
-.returning-info-form {
+/* [추가] 우측 재진 정보 영역 */
+.revisit-info-content {
+  flex: 1; /* 남은 공간 모두 차지 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* 수직 중앙 정렬 */
+  padding: 0 20px; /* 좌우 여백 */
+}
+
+.revisit-info-form {
   display: flex;
   flex-direction: column;
   gap: 1rem;

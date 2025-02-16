@@ -2,13 +2,36 @@
 
 /* 페이지 컨테이너 */
 .info-page-container {
-  display: flex;
-  flex-direction: column;
+  display: flex; /* [추가] 가로 레이아웃 */
+  flex-direction: row; /* [추가] 왼쪽=이미지, 오른쪽=정보 입력 */
+
   height: calc(100vh - 20px); /* 상하 패딩 20px을 뺌 */
   width: 80vw;
   padding: 20px;
   box-sizing: border-box;
   margin-top: -50px; /* 원하는 만큼 조정 */
+}
+
+/* [추가] 이미지 컨테이너 (좌측) */
+.info-image-container {
+  flex: 0 0 40%; /* [추가] 화면의 40% 차지 (원하는 비율로 조정 가능) */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.info-image-container img {
+  max-width: 90%; /* [추가] 이미지가 너무 커지지 않도록 */
+  height: auto;
+}
+
+/* [추가] 정보 입력란 (우측) */
+.info-content {
+  flex: 1; /* [추가] 나머지 공간 사용 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* 수직 중앙정렬 */
+  padding: 0 20px; /* 좌우 여백 */
 }
 
 .info-form {
@@ -31,7 +54,6 @@
   border-radius: 4px;
   border: 1px solid #ccc;
   box-sizing: border-box;
-  outline: none;
 }
 
 /* 체크박스 */
