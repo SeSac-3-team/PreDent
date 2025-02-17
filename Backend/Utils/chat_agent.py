@@ -20,7 +20,7 @@ code_system_prompt = """
 """
 
 # LLM 모델 생성 (temperature 조절 추가)
-chat_model = ChatOpenAI(model="gpt-4o-mini", temperature=1.0)  # temperature 값을 1.0로 설정 (엄격한 응답)
+chat_model = ChatOpenAI(model="gpt-4o-mini", temperature=1.0)  # temperature 값을 1.0로 설정 (유연한 응답)
 
 # Research Agent 생성
 chat_agent = create_react_agent(
