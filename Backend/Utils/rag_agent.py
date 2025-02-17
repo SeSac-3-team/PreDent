@@ -18,12 +18,12 @@ logging.langsmith("LangGraph")
 # 벡터 검색 기능 정의
 @tool
 def search_vectorstore(query: str):
-    """치과  정보를 검색하는 벡터스토어 검색 도구"""
+    """치과 정보를 검색하는 벡터스토어 검색 도구"""
     retriever = vectorstore.as_retriever()
     results = retriever.get_relevant_documents(query)
     return results
 
-code_system_prompt =  hub.pull("rlm/rag-prompt")
+code_system_prompt =  "치과 정보를 검색하는 벡터스토어 검색 도구"
 
 
 # RAG Agent 생성
