@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./InfoFormPage.css";
 import { getCsrfToken } from "../Utils/getCsrfToken";
+import NavigationButtons from "../components/NavigationButtons";
 
 function InfoFormPage() {
   const [name, setName] = useState("");
@@ -131,6 +132,7 @@ function InfoFormPage() {
 
   return (
     <div className="info-page-container">
+      <NavigationButtons />
       {/* [추가] 이미지 왼쪽에 배치 */}
       <div className="info-image-container">
         <img src="images/tooth_image.png" alt="치아 이미지" />
