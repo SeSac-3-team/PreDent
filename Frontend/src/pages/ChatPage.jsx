@@ -165,15 +165,15 @@ function ChatPage() {
       } catch (error) {
         console.error("오류 발생:", error);
       } finally {
-        // --- 추가된 부분: 로딩 종료 ---
+        // 로딩 종료
         setIsLoading(false);
       }
     } else {
       setMessages((prev) => [...prev, { text: answer, sender: "user" }]);
       try {
-        // --- 추가된 부분: 로딩 시작 ---
+        // 로딩 시작 : answer, patid 객체를 전달
         setIsLoading(true);
-        const llmResponse = await fetchLLMResponse(answer);
+        const llmResponse = await fetchLLMResponse({ answer, patid });
         const content2 = (
           <div>
             <ReactMarkdown>{llmResponse}</ReactMarkdown>
@@ -190,7 +190,7 @@ function ChatPage() {
       } catch (error) {
         console.error("LLM 응답 오류:", error);
       } finally {
-        // --- 추가된 부분: 로딩 종료 ---
+        // 로딩 종료
         setIsLoading(false);
       }
     }

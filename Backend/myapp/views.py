@@ -36,10 +36,33 @@ def medicert_save(request):
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-def chatbot_response(request, input_string):
-    """Django 뷰 함수 - 사용자의 질문을 받고 응답을 반환"""
-    response = agent_response(input_string) 
-    return JsonResponse({'answer': str(response)})
+@api_view(['POST'])
+def chatbot_response(request):
+    """
+    Django view function - Receives a user's question along with a patient ID,
+    constructs a detailed prompt, and returns the LLM's response.
+    
+    Expected JSON input format:
+    {
+        "answer": "User question here",
+        "patid": "PatientID"
+    }
+    """
+    answer = request.data.get("answer")
+    patid = request.data.get("patid")
+    
+    if not answer or not patid:
+        return Response({"error": "Missing answer or patid"}, status=400)
+    
+    # Construct the prompt with detailed instructions for the LLM.
+    prompt = (
+        "Please provide a detailed and accurate response based on the following information.\n"
+        f"Patient ID: {patid}\n"
+        f"User question: {answer}"
+    )
+    
+    response_text = agent_response(prompt)
+    return Response({"answer": str(response_text)})
 
 @api_view(['POST'])
 def save_patient_view(request):

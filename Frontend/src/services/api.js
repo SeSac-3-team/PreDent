@@ -1,4 +1,5 @@
 // src/services/api.js
+// vas
 export async function fetchVASResponse(userMessage) {
   const apiUrl = `http://127.0.0.1:8000/vas/${encodeURIComponent(userMessage)}`;
   try {
@@ -13,7 +14,7 @@ export async function fetchVASResponse(userMessage) {
     return `오류 발생: ${error.message}`;
   }
 }
-
+// presum
 export async function fetchPresumResponse(userMessage) {
   const apiUrl = `http://127.0.0.1:8000/presum/${encodeURIComponent(
     userMessage
@@ -30,13 +31,17 @@ export async function fetchPresumResponse(userMessage) {
     return `오류 발생: ${error.message}`;
   }
 }
-
-export async function fetchLLMResponse(userMessage) {
-  const apiUrl = `http://127.0.0.1:8000/chat/${encodeURIComponent(
-    userMessage
-  )}`;
+// LLM 답변을 answer과 patid 객체로 받아 POST로 전송
+export async function fetchLLMResponse({ answer, patid }) {
+  const apiUrl = "http://127.0.0.1:8000/chat/";
   try {
-    const response = await fetch(apiUrl);
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ answer, patid }),
+    });
     if (response.ok) {
       const data = await response.json();
       return data.answer;

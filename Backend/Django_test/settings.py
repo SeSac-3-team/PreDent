@@ -71,8 +71,12 @@ CSRF_TRUSTED_ORIGINS = [
 
 CORS_ALLOW_CREDENTIALS = True  # ✅ CSRF 쿠키 및 인증 관련 요청 허용
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5174',
-    'http://127.0.0.1:8000',
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5175",
+    "http://127.0.0.1:8000", #ydj_server
+    "http://127.0.0.1:8004", #isw_server
+    "http://127.0.0.1:8010", #akw_server
 ]
 CORS_ALLOW_ALL_ORIGINS = True  # 개발용 (모든 요청 허용)
 ROOT_URLCONF = "Django_test.urls"
