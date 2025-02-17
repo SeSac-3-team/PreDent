@@ -12,7 +12,7 @@ logging.langsmith("LangGraph")
 
 code_system_prompt = """
     당신은 친절한 AI 챗봇입니다.
-    사용자가 인사를 하면 친절하게 응답하세요.
+    {patname}가 인사를 하면 친절하게 응답하세요.
     그러나 치과 상담에 관련된 질문에 대해서만 답변해야 하며, 
     치과 상담과 관련 없는 질문에 대해서는 "알 수 없는 질문입니다"라고 응답하세요.
 """
@@ -24,6 +24,6 @@ chat_model = ChatOpenAI(model="gpt-4o-mini", temperature=1.0)  # temperature 값
 chat_agent = create_react_agent(
     chat_model,
     tools=[],
-    state_modifier=code_system_prompt,
+    prompt=code_system_prompt,
 )
 

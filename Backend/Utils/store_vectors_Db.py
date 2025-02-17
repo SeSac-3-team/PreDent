@@ -1,21 +1,21 @@
+from typing import override
 import bs4
 import os
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import WebBaseLoader
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
-from dotenv import load_dotenv
+from dotenv import load_dotenv, dotenv_values
 
 # 환경 변수 로드
-load_dotenv(dotenv_path=".env")
+load_dotenv(dotenv_path="myapp/.env")
+
 api_key = os.getenv("OPENAI_API_KEY")
 
-# 치과 진료비 URL
-dental_urls = ["https://bhdkr.modoo.at/?link=324g3j4p", # 치과 비용
-               "https://combident.co.kr/%EC%9E%84%ED%94%8C%EB%9E%80%ED%8A%B8/%EC%9E%84%ED%94%8C%EB%9E%80%ED%8A%B8%EB%9E%80", # 임플란트란?
-               "https://combident.co.kr/%EC%9E%84%ED%94%8C%EB%9E%80%ED%8A%B8/%EC%9E%84%ED%94%8C%EB%9E%80%ED%8A%B8-%EC%9E%AC%EB%A3%8C", # 임플란트 재료
+dental_urls = ["https://bhdkr.modoo.at/?link=324g3j4p",
+               "https://combident.co.kr/%EC%9E%84%ED%94%8C%EB%9E%80%ED%8A%B8/%EC%9E%84%ED%94%8C%EB%9E%80%ED%8A%B8-%EC%9E%AC%EB%A3%8C"]
 
-]
+
 all_docs = []
 for url in dental_urls:
     try:

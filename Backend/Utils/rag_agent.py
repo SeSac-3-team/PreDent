@@ -27,5 +27,5 @@ code_system_prompt =  hub.pull("rlm/rag-prompt")
 
 
 # RAG Agent 생성
-rag_agent = create_react_agent(ChatOpenAI(model="gpt-4o"), tools=[search_vectorstore],state_modifier=code_system_prompt)
+rag_agent = create_react_agent(ChatOpenAI(model="gpt-4o"), tools=[search_vectorstore],prompt=code_system_prompt)
 
