@@ -4,7 +4,6 @@ from typing_extensions import TypedDict
 
 import os
 from dotenv import load_dotenv
-load_dotenv(dotenv_path="myapp/.env")
 
 from langgraph.graph import MessagesState, END
 from langgraph.types import Command 
@@ -18,11 +17,14 @@ from langchain_openai import ChatOpenAI
 from psycopg_pool import ConnectionPool
 from langgraph.checkpoint.postgres import PostgresSaver
 
+
 from Utils.sql_agent import sql_agent
 from Utils.rag_agent import rag_agent
 from Utils.chat_agent import chat_agent
 
+patid = 2
 # memory = MemorySaver()
+load_dotenv(dotenv_path="myapp/.env")
 
 DB_URI = os.getenv("DATABASE_URL")
 # We will add a `summary` attribute (in addition to `messages` key,
@@ -31,6 +33,7 @@ class State(MessagesState):
     summary: str
     next: str
     excuted_agents: Sequence[str]
+    patid: str  # 사용자 고유 식별자 추가
 
 connection_kwargs = {
     "autocommit": True,
@@ -61,7 +64,7 @@ system_prompt = (
     " respond with the worker to act next. Each worker will perform a"
     " task and respond with their results and status."
     " - If the request is related to patient information, choose SQLagent."
-    " - If the request is related to cost, choose RAGagent."
+    " - If the request is related to dentist, choose RAGagent."
     " - If the request requires retrieving patient information before answering a cost-related question, first choose SQLagent, then choose RAGagent."
     " - If the request is a general inquiry, choose CHATagent."
     " When finished, respond with FINISH."
@@ -72,13 +75,12 @@ class Router(TypedDict):
 
     next: Literal[*options]
 
-
 def supervisor_node(state: State) -> Command[Literal[*members, "__end__"]]:
- 
-    
+
     messages = [
-        {"role": "system", "content": system_prompt},
+        {"role": "system", "content":  system_prompt},
     ] + state["messages"]
+
     response = supervisor_model.with_structured_output(Router).invoke(messages)
     goto = response["next"]
 
@@ -90,6 +92,7 @@ def supervisor_node(state: State) -> Command[Literal[*members, "__end__"]]:
     return Command(goto=goto, update={"next": goto})
 
 def sql_node(state: State) -> Command[Literal["supervisor"]]:
+    
     result = sql_agent.invoke(state)
     return Command(
         update={
@@ -157,7 +160,31 @@ def summarize_conversation(state: State):
     # 메시지가 6개 이하이면 종료합니다.
     return {"messages": messages}
 
+def patient_lookup_node(state: State):
+    """
+    patid를 사용하여 public.patient 테이블에서 patname을 조회한 후,
+    결과 메시지를 생성하여 supervisor 노드로 전달합니다.
+    """
+    patid = state["patid"]
+    query = "SELECT patname FROM public.patient WHERE patid = %s"
+    patname = "Unknown"  # 조회 결과가 없을 경우 기본값
 
+    # 데이터베이스 연결 풀(pool)을 사용하여 쿼리 실행
+    with pool.connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(query, (patid,))
+            row = cur.fetchone()
+            if row:
+                patname = row[0]
+
+    # 조회된 환자 이름을 메시지로 작성합니다.
+    message = HumanMessage(content=f"Patient Name: {patname}", name="PatientLookupNode")
+    return Command(
+        update={
+            "messages": [message],
+            "excuted_agents": state.get("excuted_agents", []) + ["PatientLookupNode"]
+        },
+    )
 
 # Define a new graph
 workflow = StateGraph(State)
@@ -169,13 +196,17 @@ workflow.add_node("RAGnode", rag_node)
 workflow.add_node("CHATnode", chat_node)
 
 workflow.add_node("summarize_conversation", summarize_conversation)
+workflow.add_node("PatientLookupNode", patient_lookup_node)
+
 
 # Set the entrypoint as conversation
 workflow.add_edge(START, "summarize_conversation")
 
 # We now add a conditional edge
 
-workflow.add_edge( "summarize_conversation", "supervisor")
+workflow.add_edge( "summarize_conversation", "PatientLookupNode")
+workflow.add_edge( "PatientLookupNode", "supervisor")
+
 
 
 
@@ -201,12 +232,12 @@ with open("mermaid_graph.png", "wb") as f:
 def agent_response(input_string):
     
     
-    config = {"configurable": {"thread_id": "214451"}}
+    config = {"configurable": {"thread_id": str(patid)}}
 
     input_message = HumanMessage(content=input_string)
     input_message.pretty_print()
 
-    for event in app.stream({"messages": [input_message],"excuted_agents":[]}, config, stream_mode="updates"):
+    for event in app.stream({"messages": [input_message],"excuted_agents":[],"patid": str(patid)}, config, stream_mode="updates"):
         print_update(event)
 
     messages = app.get_state(config).values["messages"]
