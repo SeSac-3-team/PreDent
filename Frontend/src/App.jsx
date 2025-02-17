@@ -1,12 +1,25 @@
 // src/App.jsx (Routing Page)
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useLocation,
+  Navigate,
+} from "react-router-dom";
 import Sidebar from "./components/Sidebar"; // Sidebar 컴포넌트
 import InfoFormPage from "./pages/InfoFormPage"; // 초진 환자 정보 입력 페이지
 import ChatPage from "./pages/ChatPage"; // 사전문진 및 채팅 페이지
 import VisitCheckPage from "./pages/VisitCheckPage"; // 방문이력 확인 페이지
 import RevisitFormPage from "./pages/RevisitFormPage"; // 재진 환자 정보 입력 페이지
-import DoctPage from "./pages/DoctPage"; // DoctPage 추가
+import DoctPage from "./pages/DoctPage"; // 의사 전용 페이지
+import LoginPage from "./pages/LoginPage"; // 의사 로그인 페이지
 import "./App.css";
+
+// ✅ 의사 전용 페이지 보호 (Private Route)
+const PrivateRoute = ({ children }) => {
+  const token = localStorage.getItem("doctorToken"); // 저장된 토큰 확인
+  return token ? children : <Navigate to="/login" />;
+};
 
 function App() {
   return (
@@ -21,7 +34,9 @@ function AppContent() {
 
   // VisitCheckPage ("/")에서는 사이드바를 숨김
   const hideSidebar =
-    location.pathname === "/" || location.pathname.startsWith("/doct");
+    location.pathname === "/" ||
+    location.pathname.startsWith("/doct") ||
+    location.pathname === "/login"; // 로그인 페이지에서도 사이드바 숨김
 
   return (
     <div className="app-container">
@@ -32,7 +47,19 @@ function AppContent() {
           <Route path="/info" element={<InfoFormPage />} />
           <Route path="/re_info" element={<RevisitFormPage />} />
           <Route path="/chat" element={<ChatPage />} />
-          <Route path="/doct/*" element={<DoctPage />} />
+
+          {/* ✅ 의사 전용 페이지 보호 */}
+          <Route
+            path="/doct/*"
+            element={
+              <PrivateRoute>
+                <DoctPage />
+              </PrivateRoute>
+            }
+          />
+
+          {/* 🔹 의사 로그인 페이지 추가 */}
+          <Route path="/login" element={<LoginPage />} />
         </Routes>
       </div>
     </div>

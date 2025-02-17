@@ -9,7 +9,7 @@ export default function DoctSidebar({ onRecordSelect }) {
   useEffect(() => {
     // 오늘의 문진 기록(사이드바용 최소 정보: mecid, 환자 이름, 성별) 가져오기
     axios
-      .get("http://localhost:8000/today_medicerts/")
+      .get("http://127.0.0.1:8000/today_medicerts/")
       .then((response) => {
         setRecords(response.data);
       })

@@ -1,84 +1,115 @@
-/* DoctPage.css */
-
-/* 글로벌 변수 및 기본 리셋 */
-:root {
-  --primary-color: #000000;
-  --secondary-color: #2ecc71;
-  --background-color: #f4f7f9;
-  --text-color: #333;
-  --border-color: #e0e0e0;
-  --sidebar-bg: #ffffff;
-  --hover-bg: #f0f0f0;
-  --font-family: "Roboto", sans-serif;
-  --container-padding: 1.5rem;
+/* 페이지 전체를 감싸는 래퍼: 헤더 높이만큼 패딩 추가 */
+.page-wrapper {
+  min-height: 100vh;
+  padding-top: 80px; /* 헤더 영역 높이 + 여유 공간 */
+  position: relative;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* 헤더 영역: 화면 상단 전체에 고정 */
+.doctor-header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 20px;
+  z-index: 1000;
+  background-color: rgba(
+    255,
+    255,
+    255,
+    0.9
+  ); /* 옵션: 배경색을 주어 내용과 분리 */
 }
 
-body {
-  font-family: var(--font-family);
-  background-color: var(--background-color);
-  color: var(--text-color);
+/* 의사 전용 페이지 버튼 스타일 */
+.doctor-page-button {
+  background: #28a745; /* 녹색 계열 */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s ease;
+}
+
+.doctor-page-button:hover {
+  background: #218838;
+}
+
+/* 기존 컨테이너 스타일 */
+.visit-check-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  width: 100%;
+  max-width: 1000px;
+  padding: 2rem;
+}
+
+.visit-check-container h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.visit-check-container p {
+  font-size: 1.3rem;
+  color: #333;
+  text-align: center;
+  margin-bottom: 2rem;
   line-height: 1.6;
 }
 
-/* 전체 페이지: 사이드바와 메인 영역을 포함 */
-.doctor-page {
+.visit-check-button-group {
   display: flex;
-  width: 100%;
-  min-height: 100vh; /* 전체 화면 높이를 사용 */
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
-/* 메인 콘텐츠 컨테이너 (사이드바 외의 영역) */
-.doctor-page-container {
-  display: flex;
-  flex-direction: column;
-  height: 90vh; /* 뷰포트 전체 높이 */
-  width: 82vw;
-  margin-left: 20%; /* 사이드바의 너비만큼 여백 추가 */
-  padding: 2rem; /* 내부 패딩 */
-  box-sizing: border-box;
-}
-
-/* 페이지 제목 스타일 */
-.page-title {
+.visit-check-button {
+  width: 280px;
+  height: 80px;
+  border: none;
+  border-radius: 12px;
   font-size: 1.5rem;
-  color: var(--primary-color);
-  margin-bottom: 1rem;
-  text-align: center;
+  font-weight: 700;
+  color: white;
+  background: #007bff;
+  cursor: pointer;
+  box-shadow: 0px 6px 0px #0056b3, 0px 12px 20px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease-in-out;
 }
 
-/* 반응형 레이아웃 */
+.visit-check-button:hover {
+  background: #0056b3;
+}
+
+.visit-check-button:active {
+  transform: translateY(4px);
+  box-shadow: 0px 3px 0px #0056b3, 0px 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.visit-check-button:focus {
+  outline: none;
+}
+
 @media (max-width: 768px) {
-  .doctor-page {
-    flex-direction: column;
+  .visit-check-container h1 {
+    font-size: 1.8rem;
   }
-}
 
-/* 로딩 & 오류 메시지 스타일 */
-.loading,
-.error-message,
-.empty-message {
-  text-align: center;
-  font-size: 1.2rem;
-  margin-top: 20px;
-  color: var(--text-color);
-}
+  .visit-check-container p {
+    font-size: 1.1rem;
+  }
 
-.error-message {
-  color: red;
-  font-weight: bold;
-}
-
-/* 환자 데이터 카드 스타일 */
-.patient-card {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  margin-top: 20px;
+  .visit-check-button {
+    width: 100%;
+    max-width: 250px;
+  }
 }
