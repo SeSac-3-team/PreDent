@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // 🔹 페이지 이동을 위한 useNavigate 추가
+// DoctPage.jsx
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import PatientPrescreening from "../components/PatientPrescreening";
 import axios from "axios";
 import DoctSidebar from "../components/DoctSidebar";
@@ -9,7 +10,7 @@ export default function DoctPage() {
   const [patientData, setPatientData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const navigate = useNavigate(); // 🔹 React Router의 페이지 이동 기능 사용
+  const navigate = useNavigate();
 
   const handleRecordSelect = (mecid) => {
     setLoading(true);
@@ -29,22 +30,20 @@ export default function DoctPage() {
       });
   };
 
-  // 🔹 로그아웃 버튼 클릭 시 실행
   const handleLogout = () => {
-    localStorage.removeItem("doctorToken"); // 저장된 토큰 삭제
-    navigate("/login"); // 로그인 페이지로 이동
+    localStorage.removeItem("doctorToken");
+    navigate("/login");
   };
 
   return (
     <div className="doctor-page">
-      {/* 의사용 사이드바 */}
+      {/* 왼쪽 사이드바 영역 */}
       <DoctSidebar onRecordSelect={handleRecordSelect} />
 
-      {/* 메인 콘텐츠 컨테이너 */}
+      {/* 오른쪽 메인 콘텐츠 영역 */}
       <div className="doctor-page-container">
         <div className="header">
           <h1 className="page-title">환자별 사전문진 상세</h1>
-          {/* 🔹 로그아웃 버튼 추가 */}
           <button className="logout-button" onClick={handleLogout}>
             로그아웃
           </button>

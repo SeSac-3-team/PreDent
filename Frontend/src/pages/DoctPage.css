@@ -1,37 +1,40 @@
-/* 로딩 & 오류 메시지 스타일 */
-.loading,
-.error-message,
-.empty-message {
-  text-align: center;
-  font-size: 1.2rem;
-  margin-top: 20px;
-  color: var(--text-color);
+/* Flexbox를 사용해 전체 페이지를 좌우로 배치 */
+.doctor-page {
+  display: flex;
+  min-height: 50vh;
+  background-color: #f0f2f5;
 }
 
-.error-message {
-  color: red;
-  font-weight: bold;
-}
-
-/* 환자 데이터 카드 스타일 */
-.patient-card {
-  background: white;
+.doctor-page-container {
+  display: flex;
+  flex-direction: column;
   padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+  margin-left: 20%;
+  height: 90vh; /* 뷰포트 전체 높이 */
   width: 80vw;
   padding: 20px;
-  margin-left: 20%;
   box-sizing: border-box;
-  margin: 0 auto 0 20%;
 }
 
+/* 헤더: 메인 콘텐츠 상단에 고정 */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background-color: #fff;
+  padding: 10px 20px;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 20px;
 }
 
+.page-title {
+  margin: 0;
+  font-size: 1.8rem;
+  color: #333;
+}
+
+/* 로그아웃 버튼 스타일 */
 .logout-button {
   background-color: #e74c3c;
   color: white;
@@ -40,8 +43,34 @@
   cursor: pointer;
   font-size: 16px;
   border-radius: 5px;
+  transition: background-color 0.2s ease;
 }
 
 .logout-button:hover {
   background-color: #c0392b;
+}
+
+/* 환자 카드 스타일 */
+.patient-card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 로딩, 오류, 빈 메시지 스타일 */
+.loading,
+.error-message,
+.empty-message {
+  text-align: center;
+  font-size: 1.2rem;
+  margin-top: 20px;
+  color: #555;
+}
+
+.error-message {
+  color: red;
+  font-weight: bold;
 }
