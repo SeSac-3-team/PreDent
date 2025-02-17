@@ -1,0 +1,38 @@
+.nav-buttons-container {
+  position: fixed;
+  bottom: 20px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 1000;
+}
+
+.nav-button:focus {
+  outline: none;
+}
+
+.nav-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  /* 3D 효과를 위한 그림자 */
+  box-shadow: 0 4px 0 #0056b3;
+  transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+}
+
+.nav-button:active {
+  /* 누른 느낌을 주기 위해 그림자 제거와 아래로 이동 */
+  box-shadow: 0 0 0 #0056b3;
+  transform: translateY(4px);
+}
+
+/* 추가로 호버 시 약간의 효과 */
+.nav-button:hover {
+  opacity: 0.9;
+}

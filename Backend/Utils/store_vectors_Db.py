@@ -12,12 +12,12 @@ load_dotenv(dotenv_path="myapp/.env")
 
 api_key = os.getenv("OPENAI_API_KEY")
 
-dental_urls = ["https://bhdkr.modoo.at/?link=324g3j4p",
-               "https://combident.co.kr/%EC%9E%84%ED%94%8C%EB%9E%80%ED%8A%B8/%EC%9E%84%ED%94%8C%EB%9E%80%ED%8A%B8-%EC%9E%AC%EB%A3%8C"]
-
+# 치과 진료비 URL
+dental_fee_url = os.getenv('dental_fee_url')  # 환경 변수가 없을 경우 기본값으로 빈 문자열을 설정
+dental_fee_url = dental_fee_url.split(',') 
 
 all_docs = []
-for url in dental_urls:
+for url in dental_fee_url:
     try:
         loader = WebBaseLoader(web_paths=(url,))  # 단일 URL을 튜플로 전달
         docs = loader.load()  # 웹 페이지의 모든 내용 로드
