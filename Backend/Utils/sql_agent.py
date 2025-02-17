@@ -23,8 +23,9 @@ db = SQLDatabase.from_uri(DB_URI)
 # ✅ PostgreSQL용 SQL 실행 도구 정의
 @tool
 def list_tables_tool() -> str:
-    """환자정보에 대한 질문을 할때 데이터베이스의 모든 테이블 목록을 반환"""
-    return str(db.get_usable_table_names())
+    """환자정보에 대한 질문을 할때 데이터베이스의 테이블 반환"""
+    return db.get_usable_table_names()  # 전체 테이블 목록을 가져옵니다.
+
 
 @tool
 def get_schema_tool(table_name: str) -> str:
@@ -39,19 +40,13 @@ def db_query_tool(query: str) -> str:
         return str(result)
     except Exception as e:
         return f"Error: {str(e)}"
-
-
+    
+code_system_prompt = """
+사용자의 질문에 SQL 쿼리를 활용하여 답변하세요.
+"""
 
     # Research Agent 생성
-sql_agent = create_react_agent(ChatOpenAI(model="gpt-4o-mini"), tools=[list_tables_tool, get_schema_tool, db_query_tool])
+sql_agent = create_react_agent(ChatOpenAI(model="gpt-4o"), tools=[list_tables_tool, get_schema_tool, db_query_tool], state_modifier=code_system_prompt,name="SQLagent"
+)
 
-# research node 생성
-sql_node = functools.partial(agent_node, agent=sql_agent, name="SQLagent")
 
-# sql_node(
-#     {
-#         "messages": [
-#             HumanMessage(content="환자정보에서 유동원의 주소 알려주세요.")
-#         ]
-#     }
-# )
