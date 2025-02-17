@@ -4,7 +4,6 @@ from typing_extensions import TypedDict
 
 import os
 from dotenv import load_dotenv
-load_dotenv(dotenv_path="myapp/.env")
 
 from langgraph.graph import MessagesState, END
 from langgraph.types import Command 
@@ -23,6 +22,7 @@ from Utils.rag_agent import rag_agent
 from Utils.chat_agent import chat_agent
 
 # memory = MemorySaver()
+load_dotenv(dotenv_path="myapp/.env")
 
 DB_URI = os.getenv("DATABASE_URL")
 # We will add a `summary` attribute (in addition to `messages` key,
@@ -61,7 +61,7 @@ system_prompt = (
     " respond with the worker to act next. Each worker will perform a"
     " task and respond with their results and status."
     " - If the request is related to patient information, choose SQLagent."
-    " - If the request is related to cost, choose RAGagent."
+    " - If the request is related to dentist, choose RAGagent."
     " - If the request requires retrieving patient information before answering a cost-related question, first choose SQLagent, then choose RAGagent."
     " - If the request is a general inquiry, choose CHATagent."
     " When finished, respond with FINISH."
@@ -201,7 +201,7 @@ with open("mermaid_graph.png", "wb") as f:
 def agent_response(input_string):
     
     
-    config = {"configurable": {"thread_id": "214451"}}
+    config = {"configurable": {"thread_id": "217100"}}
 
     input_message = HumanMessage(content=input_string)
     input_message.pretty_print()

@@ -1,9 +1,7 @@
 from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
 from langchain_teddynote import logging
-from langchain_community.utilities import SQLDatabase
 from langchain_core.tools import tool
-from Utils.agent_node import agent_node
 
 import os
 import functools
@@ -14,9 +12,9 @@ logging.langsmith("LangGraph")
 
 code_system_prompt = """
     당신은 친절한 AI 챗봇입니다.
-    당신은 치과 상담에 관련된 질문에 대해서만 답변해야 하며,
-    치과 상담과 관련 없는 질문에 대해서는 "알수없는 질문입니다"라고 응답하세요.
-    인사는 해주세요.
+    사용자가 인사를 하면 친절하게 응답하세요.
+    그러나 치과 상담에 관련된 질문에 대해서만 답변해야 하며, 
+    치과 상담과 관련 없는 질문에 대해서는 "알 수 없는 질문입니다"라고 응답하세요.
 """
 
 # LLM 모델 생성 (temperature 조절 추가)
@@ -27,6 +25,5 @@ chat_agent = create_react_agent(
     chat_model,
     tools=[],
     state_modifier=code_system_prompt,
-    name="CHATagent"
 )
 

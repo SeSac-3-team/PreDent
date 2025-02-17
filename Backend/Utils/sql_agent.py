@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 from langchain_teddynote import logging
 from langchain_community.utilities import SQLDatabase
 from langchain_core.tools import tool
-from Utils.agent_node import agent_node
 
 import os
 import functools
@@ -46,7 +45,7 @@ code_system_prompt = """
 """
 
     # Research Agent 생성
-sql_agent = create_react_agent(ChatOpenAI(model="gpt-4o"), tools=[list_tables_tool, get_schema_tool, db_query_tool], state_modifier=code_system_prompt,name="SQLagent"
-)
+sql_agent = create_react_agent(ChatOpenAI(model="gpt-4o"), tools=[list_tables_tool, get_schema_tool, db_query_tool],
+                                state_modifier=code_system_prompt,)
 
 
