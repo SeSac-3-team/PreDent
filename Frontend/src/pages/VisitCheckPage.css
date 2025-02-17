@@ -6,8 +6,7 @@
 .visit-check-container {
   width: 100%;
   max-width: 1000px;
-  margin: 0 auto;
-  margin-top: 300px; /* 상단 버튼 아래로 충분히 띄우기 */
+  margin: 0 auto; /* 상단 버튼 아래로 충분히 띄우기 */
   text-align: center;
   padding: 2rem;
   box-sizing: border-box;

@@ -6,7 +6,6 @@ import {
   useLocation,
   Navigate,
 } from "react-router-dom";
-import Sidebar from "./components/Sidebar"; // Sidebar 컴포넌트
 import InfoFormPage from "./pages/InfoFormPage"; // 초진 환자 정보 입력 페이지
 import ChatPage from "./pages/ChatPage"; // 사전문진 및 채팅 페이지
 import VisitCheckPage from "./pages/VisitCheckPage"; // 방문이력 확인 페이지
@@ -32,36 +31,27 @@ function App() {
 function AppContent() {
   const location = useLocation(); // 현재 경로 가져오기
 
-  // VisitCheckPage ("/")에서는 사이드바를 숨김
-  const hideSidebar =
-    location.pathname === "/" ||
-    location.pathname.startsWith("/doct") ||
-    location.pathname === "/login"; // 로그인 페이지에서도 사이드바 숨김
-
   return (
-    <div className="app-container">
-      {!hideSidebar && <Sidebar />}
-      <div className="main-content">
-        <Routes>
-          <Route path="/" element={<VisitCheckPage />} />
-          <Route path="/info" element={<InfoFormPage />} />
-          <Route path="/re_info" element={<RevisitFormPage />} />
-          <Route path="/chat" element={<ChatPage />} />
+    <div className="main-content">
+      <Routes>
+        <Route path="/" element={<VisitCheckPage />} />
+        <Route path="/info" element={<InfoFormPage />} />
+        <Route path="/re_info" element={<RevisitFormPage />} />
+        <Route path="/chat" element={<ChatPage />} />
 
-          {/* ✅ 의사 전용 페이지 보호 */}
-          <Route
-            path="/doct/*"
-            element={
-              <PrivateRoute>
-                <DoctPage />
-              </PrivateRoute>
-            }
-          />
+        {/* ✅ 의사 전용 페이지 보호 */}
+        <Route
+          path="/doct/*"
+          element={
+            <PrivateRoute>
+              <DoctPage />
+            </PrivateRoute>
+          }
+        />
 
-          {/* 🔹 의사 로그인 페이지 추가 */}
-          <Route path="/login" element={<LoginPage />} />
-        </Routes>
-      </div>
+        {/* 🔹 의사 로그인 페이지 추가 */}
+        <Route path="/login" element={<LoginPage />} />
+      </Routes>
     </div>
   );
 }
