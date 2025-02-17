@@ -15,6 +15,18 @@ import { useSTT } from "../hooks/useSTT";
 import "./ChatPage.css";
 import PreDiagnosisReport from "../components/PreDiagnosisReport";
 
+// --- 추가된 부분: 중앙에 고정된 스피너 및 진행 상황 메시지 컴포넌트 ---
+function LoadingSpinner({ message = "잠시만 기다려 주세요..." }) {
+  return (
+    <div className="loading-spinner-overlay">
+      <div className="loading-spinner-container">
+        <div className="spinner" />
+        <p className="spinner-message">{message}</p>
+      </div>
+    </div>
+  );
+}
+
 function ChatPage() {
   // 1. 진입 목적에 따른 모드 설정 (치료 vs 단순 채팅)
   const location = useLocation();
@@ -37,6 +49,9 @@ function ChatPage() {
   const [input, setInput] = useState("");
   const [isQuestionnaireCompleted, setIsQuestionnaireCompleted] =
     useState(false);
+
+  // --- 추가된 부분: 로딩 상태 추가 ---
+  const [isLoading, setIsLoading] = useState(false);
 
   // 첫 렌더 시 초기 메시지 출력 (문진 모드 vs 간단 채팅)
   const hasInitialized = useRef(false);
@@ -232,70 +247,89 @@ function ChatPage() {
       };
       setAnswers(newAnswers);
 
-      if (currentQuestionIndex < questions.length - 1) {
-        if (currentQuestionIndex === 0) {
-          const vas_res = await fetchVASResponse(answer);
-          setVas(vas_res);
+      try {
+        // --- 추가된 부분: 로딩 시작 ---
+        setIsLoading(true);
+
+        if (currentQuestionIndex < questions.length - 1) {
+          if (currentQuestionIndex === 0) {
+            const vas_res = await fetchVASResponse(answer);
+            setVas(vas_res);
+          }
+          const nextIndex = currentQuestionIndex + 1;
+          setCurrentQuestionIndex(nextIndex);
+          setMessages((prev) => [
+            ...prev,
+            {
+              text: questions[nextIndex],
+              sender: "bot",
+              avatar: "public/images/Doctor_img.png",
+            },
+          ]);
+        } else {
+          const answerString = JSON.stringify(newAnswers);
+          const pre_res = await fetchPresumResponse(answerString);
+
+          const data = {
+            ...newAnswers,
+            vas_scale: vas,
+            predicted_disease: pre_res["예상 질환"],
+            patid: patid, // 전달받은 patid 사용
+          };
+
+          axios
+            .post("http://127.0.0.1:8000/save-object/", data)
+            .then((response) => console.log("데이터 저장 성공:", response.data))
+            .catch((error) => console.error("데이터 저장 실패:", error));
+
+          setMessages((prev) => [
+            ...prev,
+            {
+              text: <PreDiagnosisReport answersToRender={pre_res} vas={vas} />,
+              sender: "pre",
+            },
+          ]);
+          setIsQuestionnaireCompleted(true);
+          setMessages((prev) => [
+            ...prev,
+            {
+              text: "사전 문진이 모두 완료되었습니다. 😊자유롭게 채팅을 이용해보세요!",
+              sender: "bot",
+              avatar: "public/images/Doctor_img.png",
+            },
+          ]);
         }
-        const nextIndex = currentQuestionIndex + 1;
-        setCurrentQuestionIndex(nextIndex);
-        setMessages((prev) => [
-          ...prev,
-          {
-            text: questions[nextIndex],
-            sender: "bot",
-            avatar: "public/images/Doctor_img.png",
-          },
-        ]);
-      } else {
-        const answerString = JSON.stringify(newAnswers);
-        const pre_res = await fetchPresumResponse(answerString);
-
-        const data = {
-          ...newAnswers,
-          vas_scale: vas,
-          predicted_disease: pre_res["예상 질환"],
-          patid: patid, // 전달받은 patid 사용
-        };
-
-        axios
-          .post("http://127.0.0.1:8000/save-object/", data)
-          .then((response) => console.log("데이터 저장 성공:", response.data))
-          .catch((error) => console.error("데이터 저장 실패:", error));
-
-        setMessages((prev) => [
-          ...prev,
-          {
-            text: <PreDiagnosisReport answersToRender={pre_res} vas={vas} />,
-            sender: "pre",
-          },
-        ]);
-        setIsQuestionnaireCompleted(true);
-        setMessages((prev) => [
-          ...prev,
-          {
-            text: "사전 문진이 모두 완료되었습니다. 😊자유롭게 채팅을 이용해보세요!",
-            sender: "bot",
-            avatar: "public/images/Doctor_img.png",
-          },
-        ]);
+      } catch (error) {
+        console.error("오류 발생:", error);
+      } finally {
+        // --- 추가된 부분: 로딩 종료 ---
+        setIsLoading(false);
       }
     } else {
       setMessages((prev) => [...prev, { text: answer, sender: "user" }]);
-      const llmResponse = await fetchLLMResponse(answer);
-      const content2 = (
-        <div>
-          <ReactMarkdown>{llmResponse}</ReactMarkdown>
-        </div>
-      );
-      setMessages((prev) => [
-        ...prev,
-        {
-          text: content2,
-          sender: "bot",
-          avatar: "public/images/Doctor_img.png",
-        },
-      ]);
+      try {
+        // --- 추가된 부분: 로딩 시작 ---
+        setIsLoading(true);
+        const llmResponse = await fetchLLMResponse(answer);
+        const content2 = (
+          <div>
+            <ReactMarkdown>{llmResponse}</ReactMarkdown>
+          </div>
+        );
+        setMessages((prev) => [
+          ...prev,
+          {
+            text: content2,
+            sender: "bot",
+            avatar: "public/images/Doctor_img.png",
+          },
+        ]);
+      } catch (error) {
+        console.error("LLM 응답 오류:", error);
+      } finally {
+        // --- 추가된 부분: 로딩 종료 ---
+        setIsLoading(false);
+      }
     }
   };
 
@@ -319,6 +353,8 @@ function ChatPage() {
 
   return (
     <div className="chat-page-container">
+      {/* --- 추가된 부분: 로딩 중일 때 오버레이로 스피너와 진행 메시지 표시 --- */}
+      {isLoading && <LoadingSpinner message="현재 답변을 생성 중입니다..." />}
       <ChatWindow messages={messages} />
       <ChatInput
         input={input}
