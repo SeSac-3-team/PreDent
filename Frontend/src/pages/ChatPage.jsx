@@ -14,6 +14,7 @@ import { useAudioRecording } from "../hooks/useAudioRecording";
 import { useSTT } from "../hooks/useSTT";
 import "./ChatPage.css";
 import PreDiagnosisReport from "../components/PreDiagnosisReport";
+import NavigationButtons from "../components/NavigationButtons";
 
 // --- 추가된 부분: 중앙에 고정된 스피너 및 진행 상황 메시지 컴포넌트 ---
 function LoadingSpinner({ message = "잠시만 기다려 주세요..." }) {
@@ -97,144 +98,6 @@ function ChatPage() {
       default:
         return "unknown";
     }
-  };
-
-  // 사전 진단 결과 렌더링 (예: 이미지, 텍스트 등)
-  const renderAnswers = (answersToRender) => {
-    const diseaseCategory = answersToRender["질환 카테고리"];
-    const diseaseArea = answersToRender["증상 위치"];
-    const imageUrlVAS = `public/assets/VASimages/${vas}.jpg`;
-    const imageUrlDC = `public/assets/DCimages/${diseaseCategory}.jpg`;
-    const imageUrlArea = `public/assets/Areaimages/${diseaseArea}.jpg`;
-
-    const content = (
-      <div
-        style={{
-          maxWidth: "800px",
-          margin: "0 auto",
-          padding: "20px",
-          fontFamily: "Arial, sans-serif",
-        }}
-      >
-        <h2
-          style={{
-            textAlign: "center",
-            fontSize: "26px",
-            fontWeight: "600",
-            marginBottom: "15px",
-            padding: "12px",
-            color: "#34495e",
-            background: "#f4f6f7",
-            borderRadius: "8px",
-            boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.05)",
-            letterSpacing: "0.5px",
-          }}
-        >
-          📝 사전진단서
-        </h2>
-        <p
-          style={{
-            color: "red",
-            fontWeight: "bold",
-            textAlign: "center",
-            marginBottom: "20px",
-            fontSize: "16px",
-          }}
-        >
-          ⚠️ 예상 질환은 참고용일 뿐이며, 정확한 검사와 치료를 위해 치과
-          전문의의 상담이 꼭 필요합니다.
-        </p>
-        <img
-          src={imageUrlVAS}
-          alt={vas}
-          style={{
-            width: "100%",
-            height: "auto",
-            display: "block",
-            marginBottom: "20px",
-            borderRadius: "8px",
-            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-          }}
-        />
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            marginBottom: "20px",
-          }}
-        >
-          <div style={{ flex: "0 0 200px", marginRight: "20px" }}>
-            <img
-              src={imageUrlDC}
-              alt={diseaseCategory}
-              style={{
-                width: "100%",
-                height: "auto",
-                borderRadius: "8px",
-                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-              }}
-            />
-          </div>
-          <div style={{ flex: "1", lineHeight: "1.6", fontSize: "16px" }}>
-            <p>
-              귀하의 문진 결과에 따라 일반적으로 예상되는 질환은{" "}
-              <strong>{answersToRender["예상 질환"]}</strong> 으로 추정됩니다.
-            </p>
-            <ReactMarkdown>{answersToRender["질환 설명"]}</ReactMarkdown>
-          </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-          }}
-        >
-          <div
-            style={{
-              flex: "1",
-              lineHeight: "1.6",
-              fontSize: "16px",
-              marginRight: "20px",
-            }}
-          >
-            <ReactMarkdown>
-              {answersToRender["초기 관리 및 생활 습관 추천"]}
-            </ReactMarkdown>
-            <p style={{ color: "blue", fontWeight: "bold" }}>
-              👨‍⚕️ 진료 시 전문의가 직접 상태를 세심하게 살펴본 뒤 환자분께 꼭
-              맞는 치료 방법을 안내해 드릴 테니 편안한 마음으로 상담 받아보세요!
-              🦷
-            </p>
-          </div>
-          <div style={{ flex: "0 0 200px", textAlign: "center" }}>
-            <p
-              style={{
-                color: "skyblue",
-                fontSize: "18px",
-                fontWeight: "bold",
-                marginBottom: "8px",
-              }}
-            >
-              증상 발생 위치
-            </p>
-            <img
-              src={imageUrlArea}
-              alt={diseaseArea}
-              style={{
-                width: "100%",
-                height: "auto",
-                borderRadius: "8px",
-                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-              }}
-            />
-          </div>
-        </div>
-      </div>
-    );
-
-    setMessages((prev) => [...prev, { text: content, sender: "pre" }]);
   };
 
   // 사용자 답변 처리 (문진 모드와 일반 채팅 모드 구분)
@@ -353,6 +216,7 @@ function ChatPage() {
 
   return (
     <div className="chat-page-container">
+      <NavigationButtons />
       {/* --- 추가된 부분: 로딩 중일 때 오버레이로 스피너와 진행 메시지 표시 --- */}
       {isLoading && <LoadingSpinner message="현재 답변을 생성 중입니다..." />}
       <ChatWindow messages={messages} />

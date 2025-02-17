@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./RevisitFormPage.css";
 import { getCsrfToken } from "../Utils/getCsrfToken";
+import NavigationButtons from "../components/NavigationButtons";
 
 function RevisitFormPage() {
   const [name, setName] = useState("");
@@ -101,6 +102,7 @@ function RevisitFormPage() {
 
   return (
     <div className="revisit-info-container">
+      <NavigationButtons />
       {/* 좌측 이미지 컨테이너 */}
       <div className="revisit-info-image-container">
         <img src="images/tooth_image.png" alt="치아 이미지" />{" "}
