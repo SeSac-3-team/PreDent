@@ -171,7 +171,8 @@ cython_debug/
 .pypirc
 
 .faiss
-.pkl
-.pckl
+*.pkl
+*.pckl
 
 faiss_index/
+
