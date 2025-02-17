@@ -13,7 +13,7 @@ load_dotenv(dotenv_path="myapp/.env")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # 치과 진료비 URL
-dental_fee_url = "https://bhdkr.modoo.at/?link=324g3j4p"
+dental_fee_url = os.getenv('dental_fee_url')
 
 # 문서 로드 - 표 데이터만 추출
 loader = WebBaseLoader(
