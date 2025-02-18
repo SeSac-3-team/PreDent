@@ -29,7 +29,8 @@ const Message = ({ msg }) => {
         <img src={msg.avatar} alt="Bot" className="chat-avatar" />
       )}
 
-      <span className="chat-text">
+      {/* 줄바꿈 적용: whiteSpace: 'pre-line' */}
+      <span className="chat-text" style={{ whiteSpace: "pre-line" }}>
         {typeof msg.text === "string" ? msg.text : msg.text}
       </span>
     </div>
