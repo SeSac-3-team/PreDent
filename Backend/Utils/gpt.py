@@ -22,7 +22,7 @@ from Utils.sql_agent import sql_agent
 from Utils.rag_agent import rag_agent
 from Utils.chat_agent import chat_agent
 
-patid = 2
+patid = 54
 # memory = MemorySaver()
 load_dotenv(dotenv_path="myapp/.env")
 
@@ -51,7 +51,7 @@ checkpointer = PostgresSaver(pool)
 checkpointer.setup()
 
 # We will use this model for both the conversation and the summarization
-model = ChatOpenAI(model="gpt-4o")
+model = ChatOpenAI(model="gpt-4o-mini")
 supervisor_model = ChatOpenAI(model="gpt-4o", temperature=0)
 
 
@@ -64,7 +64,7 @@ system_prompt = (
     " respond with the worker to act next. Each worker will perform a"
     " task and respond with their results and status."
     " - If the request is related to patient information, choose SQLagent."
-    " - If the request is related to dentist information, choose RAGagent."
+    " - If the request pertains to dental information, such as clinic details, treatment costs, or materials, select RAGagent."    
     " - If the request requires retrieving patient information before answering a cost-related question, first choose SQLagent, then choose RAGagent."
     " - If the request is a general inquiry, choose CHATagent."
     " When finished, respond with FINISH."
