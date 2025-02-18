@@ -84,6 +84,10 @@
   background-color: #ccc;
   cursor: not-allowed;
 }
+/* 버튼 클릭 시 테두리 제거 */
+.start-button:focus {
+  outline: none;
+}
 
 /* 모달 스타일 */
 .modal {
