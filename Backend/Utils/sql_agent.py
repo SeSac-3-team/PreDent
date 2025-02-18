@@ -6,7 +6,6 @@ from langchain_community.utilities import SQLDatabase
 from langchain_core.tools import tool
 
 import os
-import functools
 from langgraph.prebuilt import create_react_agent
 
 load_dotenv(dotenv_path="myapp/.env")
@@ -45,7 +44,7 @@ def db_query_tool(query: str,patid: str) -> str:
         # patid 컬럼이 언급된 경우: 올바른 patid 조건이 포함되어 있는지 확인합니다.
         if "patid" in lower_query:
             # 간단한 문자열 검색으로 ALLOWED_PATID 조건이 포함되었는지 체크합니다.
-            if f"patid = {patid}" not in lower_query and f"patid={patid}" not in lower_query:
+            if f"patid = {patid}" not in query and f"patid={patid}" not in lower_query:
                 return (
                     f"Error: 허용되지 않은 patid 데이터에 접근하려고 시도하였습니다. "
                     f"사용 가능한 patid는 {patid} 입니다."

@@ -5,7 +5,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import WebBaseLoader
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
-from dotenv import load_dotenv, dotenv_values
+from dotenv import load_dotenv
 
 # 환경 변수 로드
 load_dotenv(dotenv_path="myapp/.env")
