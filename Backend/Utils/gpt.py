@@ -22,7 +22,6 @@ from Utils.sql_agent import sql_agent
 from Utils.rag_agent import rag_agent
 from Utils.chat_agent import chat_agent
 
-patid = 54
 # memory = MemorySaver()
 load_dotenv(dotenv_path="myapp/.env")
 
@@ -45,7 +44,6 @@ pool = ConnectionPool(
     max_size=20,
     kwargs=connection_kwargs,
 )
-
 
 checkpointer = PostgresSaver(pool)
 checkpointer.setup()
@@ -128,7 +126,6 @@ def chat_node(state: State) -> Command[Literal[END]]:
         goto=END,
     )
 
-
 def summarize_conversation(state: State):
     """
     대화 상태를 확인하여 메시지 수가 6개를 초과하면 대화를 요약하고,
@@ -206,9 +203,6 @@ workflow.add_edge(START, "summarize_conversation")
 workflow.add_edge( "summarize_conversation", "PatientLookupNode")
 workflow.add_edge( "PatientLookupNode", "supervisor")
 
-
-
-
 # Finally, we compile it!
 app = workflow.compile(checkpointer=checkpointer)
 
@@ -221,16 +215,19 @@ def print_update(update):
         if "summary" in v:
             print(v["summary"])
 
-
-
 img_data = app.get_graph().draw_mermaid_png()
 # PNG 파일로 저장
 with open("mermaid_graph.png", "wb") as f:
     f.write(img_data)
 
-def agent_response(input_string):
-    
-    
+def agent_response(input_string, patid):
+    """
+    patid(환자 식별자)와 유저 입력을 받아서
+    1) 대화 메시지에 추가
+    2) StateGraph(app)를 stream_mode='updates'로 실행
+    3) 최종 메시지(가장 마지막 메시지)를 리턴
+    """
+
     config = {"configurable": {"thread_id": str(patid)}}
 
     input_message = HumanMessage(content=input_string)
