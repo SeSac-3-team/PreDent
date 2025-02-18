@@ -1,0 +1,52 @@
+/* LoadingBubble.css */
+.loading-bubble {
+  /* 메시지 흐름 내에서 inline으로 렌더링되도록 설정 */
+  display: inline-flex;
+  align-items: center;
+  background-color: #f1f0f0;
+  padding: 10px 15px;
+  border-radius: 15px;
+  max-width: 80%;
+  font-size: 16px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  position: relative;
+  margin-bottom: 10px; /* 다른 메시지와 동일한 간격 */
+}
+
+.loading-bubble.center {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.loading-bubble.top {
+  top: 20px;
+}
+
+.loading-bubble.bottom {
+  bottom: 20px;
+}
+
+.chat-bubble {
+  background-color: #f1f0f0;
+  padding: 10px 15px;
+  border-radius: 15px;
+  max-width: 80%;
+  font-size: 16px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+/* (선택사항) 말풍선 꼬리 추가 */
+.chat-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 20px;
+  border-width: 10px 10px 0;
+  border-style: solid;
+  border-color: #f1f0f0 transparent;
+}
+
+.loading-dots {
+  margin-left: 5px;
+}
