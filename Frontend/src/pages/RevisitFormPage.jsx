@@ -30,7 +30,6 @@ function RevisitFormPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!agree) {
       alert("개인정보 수집 및 이용에 동의 후 사전진료를 시작할 수 있습니다.");
       return;
