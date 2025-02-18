@@ -11,6 +11,7 @@ from langchain_core.messages import SystemMessage, RemoveMessage
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import MessagesState, StateGraph, START, END
 from langchain_core.messages import HumanMessage
+import psycopg
 
 from langchain_openai import ChatOpenAI
 
@@ -46,7 +47,10 @@ pool = ConnectionPool(
 )
 
 checkpointer = PostgresSaver(pool)
-checkpointer.setup()
+try:
+    checkpointer.setup()
+except psycopg.errors.DuplicateColumn:
+    print("task_path 컬럼이 이미 존재합니다. 마이그레이션을 건너뜁니다.")
 
 # We will use this model for both the conversation and the summarization
 model = ChatOpenAI(model="gpt-4o-mini")
@@ -56,16 +60,21 @@ supervisor_model = ChatOpenAI(model="gpt-4o", temperature=0)
 members = ["SQLnode", "RAGnode","CHATnode"]
 options = members + ["FINISH"]
 
-system_prompt = (
-    "You are a supervisor tasked with managing a conversation between the"
-    f" following workers: {members}. Given the following user request,"
-    " respond with the worker to act next. Each worker will perform a"
-    " task and respond with their results and status."
-    " - If the request is related to patient information, choose SQLagent."
-    " - If the request pertains to dental information, such as clinic details, treatment costs, or materials, select RAGagent."    
-    " - If the request requires retrieving patient information before answering a cost-related question, first choose SQLagent, then choose RAGagent."
-    " - If the request is a general inquiry, choose CHATagent."
-    " When finished, respond with FINISH."
+system_prompt = ("""
+You are a supervisor tasked with managing a conversation between the following workers: {members}.  
+Your role is to determine which worker should act next based on the user request.  
+Each worker will perform a task and respond with their results and status.  
+
+**Agent Selection Criteria:**  
+- If the request involves **내원 목적 (patpurpose) or 사전문진 (pre-consultation) or 예약 (reservation)** → Assign **SQLnode**.  
+- If the request involves **비용 (costs)** → Assign **RAGnode**.  
+- If the request involves **dental information or general inquiries** → Assign **CHATnode**.  
+
+**Additional Rules:**  
+- If the request requires **multiple agents**, assign the most relevant agent first and wait for their response before assigning another.  
+- Once all necessary tasks are completed, respond with **FINISH**.  
+"""
+
 )
 
 class Router(TypedDict):
@@ -74,20 +83,28 @@ class Router(TypedDict):
     next: Literal[*options]
 
 def supervisor_node(state: State) -> Command[Literal[*members, "__end__"]]:
-
     messages = [
-        {"role": "system", "content":  system_prompt},
+        {"role": "system", "content": system_prompt},
     ] + state["messages"]
 
     response = supervisor_model.with_structured_output(Router).invoke(messages)
     goto = response["next"]
 
-    if goto == "FINISH" and not state.get("excuted_agents",[]):
-        goto = "CHATnode"
-    elif goto == "FINISH":
-        goto = END
+    executed = state.get("excuted_agents", [])
+
+    # 이미 실행된 에이전트(goto)가 있으면 FINISH로 보냄
+    if goto in executed:
+        goto = "FINISH"
+
+    if goto == "FINISH":
+        # 아직 아무 에이전트도 실행되지 않은 경우에는 CHATnode로 가도록 처리
+        if not executed:
+            goto = "CHATnode"
+        else:
+            goto = END
 
     return Command(goto=goto, update={"next": goto})
+
 
 def sql_node(state: State) -> Command[Literal["supervisor"]]:
     
@@ -97,7 +114,7 @@ def sql_node(state: State) -> Command[Literal["supervisor"]]:
             "messages": [
                 HumanMessage(content=result["messages"][-1].content, name="SQLnode")
             ],
-            "excuted_agents": state.get("excuted_agents", []) + [str(sql_node)]
+            "excuted_agents": state.get("excuted_agents", []) + ["SQLnode"]
         },
         goto="supervisor",
     )
@@ -109,7 +126,7 @@ def rag_node(state: State) -> Command[Literal["supervisor"]]:
             "messages": [
                 HumanMessage(content=result["messages"][-1].content, name="RAGnode")
             ],
-            "excuted_agents": state.get("excuted_agents", []) + [str(rag_node)]
+            "excuted_agents": state.get("excuted_agents", []) + ["RAGnode"]
         },
         goto="supervisor",
     )
@@ -120,8 +137,8 @@ def chat_node(state: State) -> Command[Literal[END]]:
         update={
             "messages": [
                 HumanMessage(content=result["messages"][-1].content, name="CHATnode")
-            ]
-            
+            ],
+            "excuted_agents": state.get("excuted_agents", []) + ["CHATnode"]
         },
         goto=END,
     )
@@ -175,7 +192,7 @@ def patient_lookup_node(state: State):
                 patname = row[0]
 
     # 조회된 환자 이름을 메시지로 작성합니다.
-    message = HumanMessage(content=f"Patient ID: {patid}\nPatient Name: {patname}", name="PatientLookupNode")
+    message = HumanMessage(content=f"patid: {patid}\npatname: {patname}", name="PatientLookupNode")
     return Command(
         update={
             "messages": [message],
@@ -242,5 +259,4 @@ def agent_response(input_string, patid):
     for message in messages:
         message.pretty_print()
     
-
     return message.content
