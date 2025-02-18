@@ -65,7 +65,7 @@ function ChatPage() {
           {
             text: "안녕하세요!😊\n자유롭게 채팅을 이용해보세요!",
             sender: "bot",
-            avatar: "public/images/Doctor_img.png",
+            avatar: "/images/Doctor_img.png",
           },
         ]);
       } else if (questions.length > 0) {
@@ -73,7 +73,7 @@ function ChatPage() {
           {
             text: questions[0],
             sender: "bot",
-            avatar: "public/images/Doctor_img.png",
+            avatar: "/images/Doctor_img.png",
           },
         ]);
       }

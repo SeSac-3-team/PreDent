@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import "./VisitCheckPage.css";
 
 const VisitCheckPage = ({ onSelect }) => {
-  // onSelect 함수를 통해 클릭된 타입('new' or 'existing')을 부모에게 전달
   const navigate = useNavigate();
 
   const handleNewPatient = () => {
@@ -16,8 +15,17 @@ const VisitCheckPage = ({ onSelect }) => {
     navigate("/re_info");
   };
 
+  const handleDoctorPage = () => {
+    navigate("/doct");
+  };
+
   return (
     <div className="visit-check-container">
+      {/* 오른쪽 상단에 고정될 의사 전용 페이지 버튼 */}
+      <button className="doctor-page-button" onClick={handleDoctorPage}>
+        의사 전용 페이지
+      </button>
+
       <h1>안녕하세요. 편안한 진료를 위해 안내해 드리겠습니다.</h1>
       <p>처음 방문하셨다면 초진을, 다시 찾아주셨다면 재진을 선택해 주세요.</p>
 

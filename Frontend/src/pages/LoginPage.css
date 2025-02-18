@@ -1,0 +1,63 @@
+/* src/pages/LoginPage.css */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f4f4f4;
+  height: calc(100vh - 50px); /* 상하 패딩 20px을 뺌 */
+  width: 80vw;
+  padding: 20px;
+  box-sizing: border-box;
+  margin-top: -50px; /* 원하는 만큼 조정 */
+}
+
+h2 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.login-container input,
+.login-container button {
+  width: 80%;
+  max-width: 350px;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.error {
+  color: red;
+  margin-top: 3px;
+  font-size: 14px;
+}
+
+.back-button {
+  margin-top: 3px;
+  background-color: #6c757d;
+}
+
+.back-button:hover {
+  background-color: #5a6268;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
