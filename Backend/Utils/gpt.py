@@ -64,7 +64,7 @@ system_prompt = (
     " respond with the worker to act next. Each worker will perform a"
     " task and respond with their results and status."
     " - If the request is related to patient information, choose SQLagent."
-    " - If the request is related to dentist, choose RAGagent."
+    " - If the request is related to dentist information, choose RAGagent."
     " - If the request requires retrieving patient information before answering a cost-related question, first choose SQLagent, then choose RAGagent."
     " - If the request is a general inquiry, choose CHATagent."
     " When finished, respond with FINISH."
@@ -99,7 +99,7 @@ def sql_node(state: State) -> Command[Literal["supervisor"]]:
             "messages": [
                 HumanMessage(content=result["messages"][-1].content, name="SQLnode")
             ],
-             "excuted_agents": [str(sql_node)]
+            "excuted_agents": state.get("excuted_agents", []) + [str(sql_node)]
         },
         goto="supervisor",
     )
@@ -111,7 +111,7 @@ def rag_node(state: State) -> Command[Literal["supervisor"]]:
             "messages": [
                 HumanMessage(content=result["messages"][-1].content, name="RAGnode")
             ],
-            "excuted_agents": [str(rag_node)]
+            "excuted_agents": state.get("excuted_agents", []) + [str(rag_node)]
         },
         goto="supervisor",
     )
@@ -178,11 +178,10 @@ def patient_lookup_node(state: State):
                 patname = row[0]
 
     # 조회된 환자 이름을 메시지로 작성합니다.
-    message = HumanMessage(content=f"Patient Name: {patname}", name="PatientLookupNode")
+    message = HumanMessage(content=f"Patient ID: {patid}\nPatient Name: {patname}", name="PatientLookupNode")
     return Command(
         update={
             "messages": [message],
-            "excuted_agents": state.get("excuted_agents", []) + ["PatientLookupNode"]
         },
     )
 

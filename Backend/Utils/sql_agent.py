@@ -32,7 +32,7 @@ def get_schema_tool(table_name: str) -> str:
 def db_query_tool(query: str,patid: str) -> str:
     """
     PostgreSQL 데이터베이스에서 SQL 쿼리를 실행하고 결과 반환.
-    이 도구는 사용자가 ALLOWED_PATID({ALLOWED_PATID}) 외의 데이터에 접근하지 못하도록 합니다.
+    이 도구는 사용자가 patid({patid}) 외의 데이터에 접근하지 못하도록 합니다.
     """
 
     
