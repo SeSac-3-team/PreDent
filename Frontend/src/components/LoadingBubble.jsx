@@ -16,7 +16,7 @@ function LoadingBubble({ message = "답변 생성중" }) {
   return (
     <div className="loading-bubble">
       {message}
-      <span className="loading-dots">{".".repeat(dotCount)}</span>
+      <span className="loading-dots">{"•".repeat(dotCount)}</span>
     </div>
   );
 }

@@ -142,7 +142,7 @@ function RevisitFormPage() {
             <label>내원 목적</label>
             <div
               className="purpose-check"
-              style={{ display: "flex", gap: "2rem" }}
+              style={{ display: "flex", gap: "10rem" }}
             >
               <label>
                 <input
