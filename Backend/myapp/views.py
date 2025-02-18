@@ -5,6 +5,7 @@ from Utils.presum import get_presum
 from Utils.medicert import save_medicert
 from Utils.gpt import agent_response
 from Utils.patient_info import patient_info
+from Utils.medidoct import fetch_today_medicerts, fetch_medicert_detail
 import asyncio
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -15,6 +16,7 @@ from django.middleware.csrf import get_token
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.csrf import ensure_csrf_cookie
 import json
+from decouple import config
 
 load_dotenv(dotenv_path="myapp/.env")
 # Create your views here.
@@ -77,4 +79,36 @@ def existing_patient_view(request):
 @ensure_csrf_cookie
 def csrf_token_view(request):
     return JsonResponse({"csrfToken": get_token(request)})
+
+@api_view(['GET'])
+def today_medicerts(request):
+    """
+    오늘의 사전 문진 기록 목록을 반환합니다.
+    """
+    records = fetch_today_medicerts()
+    return Response(records)
+
+@api_view(['GET'])
+def medicert_detail(request, mecid):
+    """
+    특정 mecid의 사전 문진 상세 정보를 반환합니다.
+    """
+    record = fetch_medicert_detail(mecid)
+    if record is None:
+        return Response({'detail': 'Record not found'}, status=status.HTTP_404_NOT_FOUND)
+    return Response(record)
+
+
+DOCTOR_SECRET_KEY = config("DOCTOR_SECRET_KEY")
+
+@csrf_exempt  # ✅ CSRF 보호 비활성화
+def authenticate_doctor(request):
+    """의사가 올바른 토큰을 제출하면 인증됨"""
+    token = request.headers.get("Authorization")
+    
+    if token == f"Bearer {DOCTOR_SECRET_KEY}":
+        return JsonResponse({"message": "Authenticated", "isDoctor": True})
+    
+    return JsonResponse({"error": "Unauthorized"}, status=403)
+
 
