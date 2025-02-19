@@ -36,6 +36,7 @@ def web_search(query:str):
 code_system_prompt = """
 {search_vectorstore}를 사용해 진료비를 검색합니다. 
 {search_vectorstore}에서 찾을 수 없는 경우에만 {web_search}에서 검색하여 답변합니다.
+비용은 대한민국 원으로 알려주세요.
 """
 
 # RAG Agent 생성

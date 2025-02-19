@@ -53,7 +53,7 @@ except psycopg.errors.DuplicateColumn:
     print("task_path 컬럼이 이미 존재합니다. 마이그레이션을 건너뜁니다.")
 
 # We will use this model for both the conversation and the summarization
-model = ChatOpenAI(model="gpt-4o-mini")
+model = ChatOpenAI(model="gpt-3.5-turbo")
 supervisor_model = ChatOpenAI(model="gpt-4o", temperature=0)
 
 
@@ -66,7 +66,7 @@ Your role is to determine which worker should act next based on the user request
 Each worker will perform a task and respond with their results and status.  
 
 **Agent Selection Criteria:**  
-- If the request involves **내원 목적 (patpurpose) or 사전문진 (pre-consultation) or 예약 (reservation)** → Assign **SQLnode**.  
+- If the request involves **사전문진 (pre-consultation) or 예약 (reservation)** → Assign **SQLnode**.  
 - If the request involves **비용 (costs)** → Assign **RAGnode**.  
 - If the request involves **dental information or general inquiries** → Assign **CHATnode**.  
 
@@ -176,23 +176,42 @@ def summarize_conversation(state: State):
 
 def patient_lookup_node(state: State):
     """
-    patid를 사용하여 public.patient 테이블에서 patname을 조회한 후,
+    patid를 사용하여 public.patient 테이블에서 patname, patpurpose를 조회하고,
+    patpurpose가 '치료'인 경우에만 public.medicert 테이블에서 predicted_disease를 조회한 후,
     결과 메시지를 생성하여 supervisor 노드로 전달합니다.
     """
     patid = state["patid"]
-    query = "SELECT patname FROM public.patient WHERE patid = %s"
-    patname = "Unknown"  # 조회 결과가 없을 경우 기본값
+    query_patient = "SELECT patname, patpurpose FROM public.patient WHERE patid = %s"
+    query_medicert = "SELECT predicted_disease FROM public.medicert WHERE patid = %s"
+    patname = "Unknown"            # 기본값
+    patpurpose = "Unknown"         # 기본값
+    predicted_disease = "Unknown"  # 기본값
 
     # 데이터베이스 연결 풀(pool)을 사용하여 쿼리 실행
     with pool.connection() as conn:
         with conn.cursor() as cur:
-            cur.execute(query, (patid,))
+            # 환자 정보 조회
+            cur.execute(query_patient, (patid,))
             row = cur.fetchone()
             if row:
-                patname = row[0]
+                patname, patpurpose = row
 
-    # 조회된 환자 이름을 메시지로 작성합니다.
-    message = HumanMessage(content=f"patid: {patid}\npatname: {patname}", name="PatientLookupNode")
+                # patpurpose가 '치료'인 경우에만 예측된 질병 조회
+                if patpurpose == "치료":
+                    cur.execute(query_medicert, (patid,))
+                    med_row = cur.fetchone()
+                    if med_row:
+                        predicted_disease = med_row[0]
+                    else:
+                        predicted_disease = "No prediction"
+                else:
+                    predicted_disease = "Not applicable"
+
+    # 조회된 정보를 메시지로 작성합니다.
+    message = HumanMessage(
+        content=f"patid: {patid}\npatname: {patname}\npatpurpose: {patpurpose}\npredicted_disease: {predicted_disease}",
+        name="PatientLookupNode"
+    )
     return Command(
         update={
             "messages": [message],
