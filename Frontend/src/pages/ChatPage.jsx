@@ -16,18 +16,6 @@ import "./ChatPage.css";
 import PreDiagnosisReport from "../components/PreDiagnosisReport";
 import NavigationButtons from "../components/NavigationButtons";
 
-// --- 추가된 부분: 중앙에 고정된 스피너 및 진행 상황 메시지 컴포넌트 ---
-function LoadingSpinner({ message = "잠시만 기다려 주세요..." }) {
-  return (
-    <div className="loading-spinner-overlay">
-      <div className="loading-spinner-container">
-        <div className="spinner" />
-        <p className="spinner-message">{message}</p>
-      </div>
-    </div>
-  );
-}
-
 function ChatPage() {
   // 1. 진입 목적에 따른 모드 설정 (치료 vs 단순 채팅)
   const location = useLocation();
@@ -51,7 +39,8 @@ function ChatPage() {
   const [isQuestionnaireCompleted, setIsQuestionnaireCompleted] =
     useState(false);
 
-  // --- 추가된 부분: 로딩 상태 추가 ---
+  // 로딩 상태는 이제 메시지 배열에 로딩 타입 메시지로 반영합니다.
+  // 기존의 isLoading 상태는 API 호출 중 플래그로 사용합니다.
   const [isLoading, setIsLoading] = useState(false);
 
   // 첫 렌더 시 초기 메시지 출력 (문진 모드 vs 간단 채팅)
@@ -125,7 +114,11 @@ function ChatPage() {
   // 사용자 답변 처리 (문진 모드와 일반 채팅 모드 구분)
   const handleUserAnswer = async (answer) => {
     if (!isQuestionnaireCompleted) {
-      setMessages((prev) => [...prev, { text: answer, sender: "user" }]);
+      // 사용자 답변 추가
+      setMessages((prev) => [
+        ...prev,
+        { id: Date.now(), type: "user", text: answer },
+      ]);
       const newAnswers = {
         ...answers,
         [getQuestionKey(currentQuestionIndex)]: answer,
@@ -133,8 +126,10 @@ function ChatPage() {
       setAnswers(newAnswers);
 
       try {
-        // --- 추가된 부분: 로딩 시작 ---
+        // 로딩 시작
         setIsLoading(true);
+        // 로딩 메시지(로딩 말풍선) 추가 (실제 답변이 들어올 위치에 inline 렌더링)
+        setMessages((prev) => [...prev, { id: "loading", type: "loading" }]);
 
         if (currentQuestionIndex < questions.length - 1) {
           if (currentQuestionIndex === 0) {
@@ -143,12 +138,16 @@ function ChatPage() {
           }
           const nextIndex = currentQuestionIndex + 1;
           setCurrentQuestionIndex(nextIndex);
+          // 로딩 메시지 제거 후 다음 질문 추가 (pop 애니메이션 효과 적용)
+          setMessages((prev) => prev.filter((msg) => msg.id !== "loading"));
           setMessages((prev) => [
             ...prev,
             {
+              id: Date.now(),
+              type: "bot",
               text: questions[nextIndex],
-              sender: "bot",
-              avatar: "public/images/Doctor_img.png",
+              avatar: "/images/Doctor_img.png",
+              animate: true, // 새 메시지 pop 애니메이션 플래그
             },
           ]);
         } else {
@@ -167,52 +166,66 @@ function ChatPage() {
             .then((response) => console.log("데이터 저장 성공:", response.data))
             .catch((error) => console.error("데이터 저장 실패:", error));
 
+          // 로딩 메시지 제거 후 프리다이애그노시스 보고서 추가
+          setMessages((prev) => prev.filter((msg) => msg.id !== "loading"));
           setMessages((prev) => [
             ...prev,
             {
+              id: Date.now(),
+              type: "pre",
               text: <PreDiagnosisReport answersToRender={pre_res} vas={vas} />,
-              sender: "pre",
             },
           ]);
           setIsQuestionnaireCompleted(true);
           setMessages((prev) => [
             ...prev,
             {
+              id: Date.now() + 1,
+              type: "bot",
               text: "사전 문진이 모두 완료되었습니다. 😊자유롭게 채팅을 이용해보세요!",
-              sender: "bot",
-              avatar: "public/images/Doctor_img.png",
+              avatar: "/images/Doctor_img.png",
+              animate: true,
             },
           ]);
         }
       } catch (error) {
         console.error("오류 발생:", error);
       } finally {
-        // --- 추가된 부분: 로딩 종료 ---
+        // 로딩 종료
         setIsLoading(false);
       }
     } else {
-      setMessages((prev) => [...prev, { text: answer, sender: "user" }]);
+      // 일반 채팅 모드의 경우
+      setMessages((prev) => [
+        ...prev,
+        { id: Date.now(), type: "user", text: answer },
+      ]);
       try {
-        // --- 추가된 부분: 로딩 시작 ---
+        // 로딩 시작 : answer, patid 객체를 전달
         setIsLoading(true);
-        const llmResponse = await fetchLLMResponse(answer);
-        const content2 = (
-          <div>
-            <ReactMarkdown>{llmResponse}</ReactMarkdown>
-          </div>
-        );
+        // API 호출 전에 로딩 메시지 추가 (실제 답변 자리)
+        setMessages((prev) => [...prev, { id: "loading", type: "loading" }]);
+        const llmResponse = await fetchLLMResponse({ answer, patid });
+        // 로딩 메시지 제거 후 실제 답변 추가 (pop 애니메이션 적용)
+        setMessages((prev) => prev.filter((msg) => msg.id !== "loading"));
         setMessages((prev) => [
           ...prev,
           {
-            text: content2,
-            sender: "bot",
-            avatar: "public/images/Doctor_img.png",
+            id: Date.now(),
+            type: "bot",
+            text: (
+              <div>
+                <ReactMarkdown>{llmResponse}</ReactMarkdown>
+              </div>
+            ),
+            animate: true,
+            avatar: "/images/Doctor_img.png",
           },
         ]);
       } catch (error) {
         console.error("LLM 응답 오류:", error);
       } finally {
-        // --- 추가된 부분: 로딩 종료 ---
+        // 로딩 종료
         setIsLoading(false);
       }
     }
@@ -227,7 +240,7 @@ function ChatPage() {
   };
 
   // STT 관련 훅 사용
-  const { isTranscribing, transcription, sendAudioToOpenAI } = useSTT();
+  const { isTranscribing, sendAudioToOpenAI } = useSTT();
 
   // 음성 녹음 훅 사용 (녹음 종료 시 STT 처리 콜백 지정)
   const { isRecording, startRecording, stopRecording } = useAudioRecording(
@@ -239,8 +252,6 @@ function ChatPage() {
   return (
     <div className="chat-page-container">
       <NavigationButtons />
-      {/* --- 추가된 부분: 로딩 중일 때 오버레이로 스피너와 진행 메시지 표시 --- */}
-      {isLoading && <LoadingSpinner message="현재 답변을 생성 중입니다..." />}
       <ChatWindow messages={messages} />
       <ChatInput
         input={input}
