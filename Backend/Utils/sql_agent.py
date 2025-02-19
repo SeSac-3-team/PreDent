@@ -44,7 +44,6 @@ code_system_prompt = """
 단, 사용자 본인의 patid({patid}) 외의 데이터에는 접근할 수 없습니다.
 사전문진 응답에는 medicert 테이블을 사용합니다.
 예약 응답에는 dental_appointment 테이블을 사용합니다.
-내원 목적 응답에는 patient 테이블의 patpurpose column을 사용합니다.
 등록된 예약이 없다면 날짜와 시간을 입력 받아 새로운 예약을 생성해줍니다.
 """
 
