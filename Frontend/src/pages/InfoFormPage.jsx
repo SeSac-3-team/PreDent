@@ -211,7 +211,7 @@ function InfoFormPage() {
 
           <div className="form-group">
             <label>성별</label>
-            <div style={{ display: "flex", gap: "11rem" }}>
+            <div style={{ display: "flex", gap: "2rem" }}>
               <label>
                 <input
                   type="radio"
@@ -239,7 +239,7 @@ function InfoFormPage() {
             <label>휴대폰 번호</label>
             <input
               type="text"
-              placeholder="번호를 입력하세요"
+              placeholder="예) 01012345678"
               value={phone}
               onChange={handlePhoneChange}
               onBlur={handlePhoneBlur}
@@ -250,7 +250,7 @@ function InfoFormPage() {
             <label>생년월일</label>
             <input
               type="text"
-              placeholder="숫자를 입력하세요"
+              placeholder="예) 19901224"
               value={birth}
               onChange={handleBirthChange}
               onBlur={handleBirthBlur}
@@ -260,7 +260,7 @@ function InfoFormPage() {
           <div className="form-group">
             <label>주소</label>
             <input
-              type="text"
+              type="address"
               placeholder="주소를 입력하세요"
               value={address}
               onChange={(e) => setAddress(e.target.value)}

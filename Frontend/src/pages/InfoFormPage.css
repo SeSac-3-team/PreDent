@@ -8,41 +8,31 @@
   width: 80vw;
   padding: 20px;
   box-sizing: border-box;
-  margin-top: 0;
-  margin-bottom: 0;
-  /* 전체 배경색을 아주 밝게 */
-  background-color: #f4f4f9;
-  /* 또는 완전 흰색: #fff */
+  margin-top: -50px; /* 원하는 만큼 조정 */
 }
 
 /* 이미지 컨테이너 (좌측) */
 .info-image-container {
-  flex: 0 0 42%;
+  flex: 0 0 40%; /* 화면의 40% 차지 (원하는 비율로 조정 가능) */
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .info-image-container img {
-  max-width: 90%;
+  max-width: 90%; /* 이미지가 너무 커지지 않도록 */
   height: auto;
 }
 
 /* 정보 입력란 (우측) */
 .info-content {
-  flex: 1;
+  flex: 1; /* 나머지 공간 사용 */
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 0 20px;
+  justify-content: center; /* 수직 중앙정렬 */
+  padding: 0 20px; /* 좌우 여백 */
 }
 
-.info-content p {
-  margin-top: 0; /* 원하는 만큼 조정 */
-  margin-bottom: 0.25; /* 원하는 만큼 조정 */
-}
-
-/* 폼 전체 */
 .info-form {
   display: flex;
   flex-direction: column;
@@ -52,72 +42,36 @@
 /* 각 폼 그룹 */
 .form-group label {
   display: block;
-  font-weight: 600; /* 살짝 두껍게 */
-  font-size: 0.95rem;
-  margin-bottom: 0.4rem;
-  color: #333; /* 진한 그레이 */
+  font-weight: bold;
+  margin-bottom: 0.3rem;
 }
 
-/* 모든 input 기본 스타일 */
 .form-group input {
   background-color: #f2f2f2;
   color: #000;
-  padding: 0.75rem; /* 위아래 여백 살짝 늘림 */
+  padding: 0.5rem;
   border-radius: 4px;
   border: 1px solid #ccc;
   box-sizing: border-box;
-  font-size: 1rem;
-  transition: border-color 0.2s; /* 포커스 시 애니메이션 */
 }
 
-/* 포커스 시 테두리색 강조 */
-.form-group input:focus {
-  outline: none;
-  border-color: #0d6efd; /* 포인트 컬러 */
-}
-
-/* 타입별로 구분하여 텍스트 필드만 너비 늘림 */
-.form-group input[type="text"] {
-  width: 100%;
-  /* 원하는 경우 100%로 하여 줄 맞춤. 
-     특정 px 고정이면 320px 등으로 조정 */
-}
-
-/* 플레이스홀더 스타일 */
-.form-group input::placeholder {
-  color: #999;
-  font-size: 0.95rem;
-}
-
-/* 체크박스, 라디오 등은 기존 크기 유지 */
+/* 체크박스 */
 .form-check {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.form-check input[type="checkbox"],
-.form-group input[type="radio"] {
-  width: auto; /* 라디오/체크박스는 고정 크기 */
-  margin-right: 4px;
-}
-
 /* 사전문진 시작 버튼 */
 .start-button {
-  background-color: #0d6efd; /* 파랑 계열 */
+  background-color: #007bff;
   color: #fff;
   border: none;
-  padding: 0.8rem 1.2rem;
+  padding: 0.7rem 1rem;
   cursor: pointer;
   border-radius: 4px;
   font-size: 1rem;
   outline: none;
-  transition: background-color 0.2s;
-  margin-top: 1rem; /* 버튼 위에 약간 여백 */
-}
-
-.start-button:hover {
-  background-color: #0b5ed7; /* hover 시 살짝 어둡게 */
 }
 
 .start-button:disabled {
@@ -125,45 +79,28 @@
   cursor: not-allowed;
 }
 
-/* 모달 스타일 (기존 유지) */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
+/* 버튼 클릭 시 테두리 제거 */
+.start-button:focus {
+  outline: none;
+}
+
+/* 모든 브라우저에 대응하기 위해 여러 개 선언 */
+.form-group input::placeholder {
+  /* 현대 표준 */
+  color: #999; /* 플레이스홀더 글자색 */
+  font-size: 0.95rem;
+}
+
+/* placehold 텍스트 필드만 너비/높이 늘림 */
+.form-group input[type="text"] {
+  width: 30%;
+  /* 원하는 경우 100%로 하여 줄 맞춤. 
+     특정 px 고정이면 320px 등으로 조정 */
+}
+
+/* placehold 텍스트 필드만 너비/높이 늘림 */
+.form-group input[type="address"] {
   width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-content {
-  background-color: #fff;
-  padding: 2rem;
-  border-radius: 8px;
-  text-align: center;
-  max-width: 500px;
-  width: 90%;
-}
-
-.modal-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.modal-buttons button {
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  border-radius: 4px;
-  font-size: 1rem;
-}
-
-.modal-buttons button:hover {
-  background-color: #0056b3;
+  /* 원하는 경우 100%로 하여 줄 맞춤. 
+     특정 px 고정이면 320px 등으로 조정 */
 }
