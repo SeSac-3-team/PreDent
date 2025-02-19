@@ -9,11 +9,10 @@ const Message = ({ msg }) => {
       {msg.sender === "bot" && msg.avatar && (
         <img src={msg.avatar} alt="Bot" className="chat-avatar" />
       )}
-      <span className="chat-text">
-        {typeof msg.text === "string"
-          ? msg.text
-          : // JSX나 컴포넌트가 들어올 경우 그대로 렌더링
-            msg.text}
+
+      {/* 줄바꿈 적용: whiteSpace: 'pre-line' */}
+      <span className="chat-text" style={{ whiteSpace: "pre-line" }}>
+        {typeof msg.text === "string" ? msg.text : msg.text}
       </span>
     </div>
   );

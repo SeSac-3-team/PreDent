@@ -77,3 +77,29 @@
   background-color: #ccc;
   cursor: not-allowed;
 }
+
+/* 버튼 클릭 시 테두리 제거 */
+.start-button:focus {
+  outline: none;
+}
+
+/* 모든 브라우저에 대응하기 위해 여러 개 선언 */
+.form-group input::placeholder {
+  /* 현대 표준 */
+  color: #999; /* 플레이스홀더 글자색 */
+  font-size: 0.95rem;
+}
+
+/* placehold 텍스트 필드만 너비/높이 늘림 */
+.form-group input[type="text"] {
+  width: 30%;
+  /* 원하는 경우 100%로 하여 줄 맞춤. 
+     특정 px 고정이면 320px 등으로 조정 */
+}
+
+/* placehold 텍스트 필드만 너비/높이 늘림 */
+.form-group input[type="address"] {
+  width: 100%;
+  /* 원하는 경우 100%로 하여 줄 맞춤. 
+     특정 px 고정이면 320px 등으로 조정 */
+}

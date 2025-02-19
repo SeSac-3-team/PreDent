@@ -115,10 +115,10 @@ function RevisitFormPage() {
 
         <form onSubmit={handleSubmit} className="revisit-info-form">
           <div className="form-group">
-            <label>성명</label>
+            <label>이름</label>
             <input
               type="text"
-              placeholder="성명을 입력하세요"
+              placeholder="이름을 입력하세요"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
@@ -128,7 +128,7 @@ function RevisitFormPage() {
             <label>휴대폰 번호</label>
             <input
               type="text"
-              placeholder="휴대폰 번호를 입력하세요"
+              placeholder="예) 01012345678"
               value={phone}
               // 숫자만 입력되도록 필터링
               onChange={(e) => {
@@ -143,7 +143,7 @@ function RevisitFormPage() {
             <label>내원 목적</label>
             <div
               className="purpose-check"
-              style={{ display: "flex", gap: "2rem" }}
+              style={{ display: "flex", gap: "10rem" }}
             >
               <label>
                 <input
