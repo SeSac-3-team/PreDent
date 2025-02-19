@@ -20,6 +20,11 @@
   justify-content: center;
 }
 
+/* 로딩 메시지: 봇처럼 왼쪽 정렬 (다음 답변 위치) */
+.chat-message.loading {
+  justify-content: flex-start;
+}
+
 /* 아바타 이미지 */
 .chat-avatar {
   width: 40px;
@@ -42,4 +47,24 @@
 .chat-message.user .chat-text {
   background-color: #007bff; /* 원하는 파란색 */
   color: #fff; /* 텍스트 흰색 */
+}
+
+/* pop 애니메이션 */
+@keyframes popUp {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.3;
+  }
+  60% {
+    transform: scale(1.05);
+    opacity: 0.95;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.pop-animation {
+  animation: popUp 0.6s ease-out;
 }
