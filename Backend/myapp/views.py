@@ -50,25 +50,15 @@ def chatbot_response(request):
         "patid": "환자 ID"
     }
     """
-    answer = request.data.get("answer")
+    input_string = request.data.get("answer")
     patid = request.data.get("patid")
     
-    if not answer or not patid:
+    if not input_string or not patid:
         return Response({"error": "Missing answer or patid"}, status=400)
 
-    prompt = (
-    (
-    "아래 정보를 참고하여, 한국어로 친절하고 자세한 답변을 작성해 주세요:\n\n"
-    "1) 환자 이름이 확인될 경우, 예) \"{patname}님\"과 같이 존칭을 사용하세요.\n"
-    "2) 치과 관련 질문이라면, 전문적인 지식을 바탕으로 이해하기 쉽게 설명해주세요.\n"
-    "3) 환자 ID \"{patid}\"는 사용자가 명시적으로 요청하지 않는 한 언급하지 마세요.\n"
-    "4) 환자 이름이 'Unknown'인 경우, '환자 정보가 확인되지 않습니다.'라고 안내해 주세요.\n\n"
-    f"환자 ID: {patid}\n"
-    f"사용자 질문: {answer}"
-)
-)
+
     # agent_response가 (prompt, patid)를 요구한다면:
-    response_text = agent_response(prompt, patid)
+    response_text = agent_response(input_string, patid)
     return Response({"answer": str(response_text)})
 
 @api_view(['POST'])
