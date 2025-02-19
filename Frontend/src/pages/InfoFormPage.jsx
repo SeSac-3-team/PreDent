@@ -1,3 +1,4 @@
+// src/pages/InfoFormPage.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -18,7 +19,20 @@ function InfoFormPage() {
 
   const navigate = useNavigate();
 
-  // 생년월일 입력 필드 onBlur: 8자리 숫자 입력 시 YYYY-MM-DD 형식으로 포맷팅
+  // -------------------------
+  // 생년월일 입력 로직
+  // -------------------------
+
+  // 생년월일 onChange: 8자리까지만 숫자만 입력
+  const handleBirthChange = (e) => {
+    let value = e.target.value.replace(/[^0-9]/g, ""); // 숫자만 추출
+    if (value.length > 8) {
+      value = value.slice(0, 8); // 최대 8자리 제한
+    }
+    setBirth(value);
+  };
+
+  // 생년월일 onBlur: 정확히 8자리이면 YYYY-MM-DD로 포맷
   const handleBirthBlur = () => {
     const value = birth.trim();
     if (value.length === 8 && /^\d+$/.test(value)) {
@@ -30,7 +44,20 @@ function InfoFormPage() {
     }
   };
 
-  // 휴대폰 번호 입력 필드 onBlur: 11자리 숫자 입력 시 010-1234-5678 형식으로 포맷팅
+  // -------------------------
+  // 휴대폰 번호 입력 로직
+  // -------------------------
+
+  // 휴대폰 번호 onChange: 11자리까지만 숫자만 입력
+  const handlePhoneChange = (e) => {
+    let value = e.target.value.replace(/[^0-9]/g, ""); // 숫자만 추출
+    if (value.length > 11) {
+      value = value.slice(0, 11); // 최대 11자리 제한
+    }
+    setPhone(value);
+  };
+
+  // 휴대폰 번호 onBlur: 11자리면 010-1234-5678 형식으로 포맷
   const handlePhoneBlur = () => {
     const value = phone.trim();
     if (value.length === 11 && /^\d+$/.test(value)) {
@@ -42,15 +69,12 @@ function InfoFormPage() {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // -------------------------
+  // 사용자 입력 검증 로직
+  // -------------------------
 
-    if (!agree) {
-      alert("개인정보 수집 및 이용에 동의 후 사전진료를 시작할 수 있습니다.");
-      return;
-    }
-
-    // 필수 입력란이 비어있는지 확인 (성명, 성별, 휴대폰 번호, 생년월일, 주소, 내원 목적)
+  // 필수 입력란이 비어있는지 확인 (성명, 성별, 휴대폰 번호, 생년월일, 주소, 내원 목적)
+  const isFormValid = () => {
     if (
       name.trim() === "" ||
       gender.trim() === "" ||
@@ -59,18 +83,49 @@ function InfoFormPage() {
       address.trim() === "" ||
       purpose.trim() === ""
     ) {
+      return false;
+    }
+
+    // 전화번호가 11자리인지 확인
+    const numericPhone = phone.replace(/[^0-9]/g, "");
+    if (numericPhone.length < 11) {
+      return false;
+    }
+
+    // 생년월일이 8자리인지 확인
+    const numericBirth = birth.replace(/[^0-9]/g, "");
+    if (numericBirth.length < 8) {
+      return false;
+    }
+
+    // 개인정보 동의 여부
+    if (!agree) {
+      return false;
+    }
+
+    return true;
+  };
+
+  // -------------------------
+  // 사용자 입력 제출 로직
+  // -------------------------
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // 필수 입력란 또는 전화번호/생년월일 불완전 입력 시 모달 띄우기
+    if (!isFormValid()) {
       setShowEmptyModal(true);
       return;
     }
 
     // 사용자가 입력한 모든 데이터를 객체로 생성
     const data = {
-      name: name,
-      gender: gender,
-      phone: phone,
-      birth: birth,
-      address: address,
-      purpose: purpose,
+      name,
+      gender,
+      phone,
+      birth,
+      address,
+      purpose,
       agree: agree ? 1 : 0,
     };
 
@@ -92,10 +147,10 @@ function InfoFormPage() {
         // 기존 환자(PID 존재): 이름, 전화번호를 제외한 나머지 정보를 업데이트
         const updateData = {
           patient_id: checkResponse.data.patient_id,
-          gender: gender,
-          birth: birth,
-          address: address,
-          purpose: purpose,
+          gender,
+          birth,
+          address,
+          purpose,
           agree: agree ? 1 : 0,
         };
 
@@ -156,7 +211,7 @@ function InfoFormPage() {
 
           <div className="form-group">
             <label>성별</label>
-            <div style={{ display: "flex", gap: "1rem" }}>
+            <div style={{ display: "flex", gap: "2rem" }}>
               <label>
                 <input
                   type="radio"
@@ -184,13 +239,9 @@ function InfoFormPage() {
             <label>휴대폰 번호</label>
             <input
               type="text"
-              placeholder="휴대폰 번호를 입력하세요"
+              placeholder="예) 01012345678"
               value={phone}
-              onChange={(e) => {
-                // 숫자만 입력되도록 필터링
-                const filteredValue = e.target.value.replace(/[^0-9]/g, "");
-                setPhone(filteredValue);
-              }}
+              onChange={handlePhoneChange}
               onBlur={handlePhoneBlur}
             />
           </div>
@@ -199,9 +250,9 @@ function InfoFormPage() {
             <label>생년월일</label>
             <input
               type="text"
-              placeholder="생년월일을 입력하세요"
+              placeholder="예) 19901224"
               value={birth}
-              onChange={(e) => setBirth(e.target.value)}
+              onChange={handleBirthChange}
               onBlur={handleBirthBlur}
             />
           </div>
@@ -209,7 +260,7 @@ function InfoFormPage() {
           <div className="form-group">
             <label>주소</label>
             <input
-              type="text"
+              type="address"
               placeholder="주소를 입력하세요"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
@@ -267,18 +318,18 @@ function InfoFormPage() {
             </label>
           </div>
 
-          <button type="submit" className="start-button" disabled={!agree}>
+          <button type="submit" className="start-button">
             사전진료 시작
           </button>
         </form>
 
         {message && <p>{message}</p>}
 
-        {/* 필수 정보 미입력 시 표시되는 모달 */}
+        {/* 필수 정보 미입력 or 전화번호/생년월일 불완전 시 표시되는 모달 */}
         {showEmptyModal && (
           <div className="modal">
             <div className="modal-content">
-              <p>환자 정보를 확인해주세요</p>
+              <p>사용자 정보를 확인해주세요</p>
               <div className="modal-buttons">
                 <button onClick={() => setShowEmptyModal(false)}>확인</button>
               </div>

@@ -11,7 +11,6 @@
   padding: 20px;
   box-sizing: border-box;
 }
-
 /* 좌측 이미지 컨테이너 */
 .revisit-info-image-container {
   flex: 0 0 40%; /* 원하는 비율로 조정 */
@@ -19,12 +18,10 @@
   justify-content: center;
   align-items: center;
 }
-
 .revisit-info-image-container img {
   max-width: 90%; /* 이미지 크기 제한 */
   height: auto;
 }
-
 /* 우측 재진 정보 영역 */
 .revisit-info-content {
   flex: 1; /* 남은 공간 모두 차지 */
@@ -33,20 +30,17 @@
   justify-content: center; /* 수직 중앙 정렬 */
   padding: 0 20px; /* 좌우 여백 */
 }
-
 .revisit-info-form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
-
 /* 각 폼 그룹 */
 .form-group label {
   display: block;
   font-weight: bold;
   margin-bottom: 0.3rem;
 }
-
 .form-group input {
   background-color: #f2f2f2;
   color: #000;
@@ -55,20 +49,17 @@
   border: 1px solid #ccc;
   box-sizing: border-box;
 }
-
 /* 내원 목적 선택 그룹 */
 .purpose-check {
   display: flex;
   gap: 2rem;
 }
-
 /* 체크박스 */
 .form-check {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
-
 /* 사전진료 시작 버튼 */
 .start-button {
   background-color: #007bff;
@@ -79,7 +70,6 @@
   border-radius: 4px;
   font-size: 1rem;
 }
-
 .start-button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
@@ -88,7 +78,6 @@
 .start-button:focus {
   outline: none;
 }
-
 /* 모달 스타일 */
 .modal {
   position: fixed;
@@ -101,7 +90,6 @@
   justify-content: center;
   align-items: center;
 }
-
 .modal-content {
   background-color: #fff;
   padding: 2rem;
@@ -110,14 +98,12 @@
   max-width: 500px;
   width: 90%;
 }
-
 .modal-buttons {
   display: flex;
   justify-content: center;
   gap: 1rem;
   margin-top: 1rem;
 }
-
 .modal-buttons button {
   background-color: #007bff;
   color: #fff;
@@ -127,7 +113,6 @@
   border-radius: 4px;
   font-size: 1rem;
 }
-
 .modal-buttons button:hover {
   background-color: #0056b3;
 }
