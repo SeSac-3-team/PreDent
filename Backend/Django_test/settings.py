@@ -24,7 +24,7 @@ DEBUG = config('DJANGO_DEBUG', default=False, cast=bool)
 API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
 
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1').split(',')
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost').split(',')
 
 
 # Application definition
