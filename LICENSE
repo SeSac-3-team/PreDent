@@ -1,0 +1,118 @@
+MIT License
+
+Copyright (c) 2025 SeSac-3-team
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+---
+
+## Third-Party Licenses
+
+This project uses third-party libraries with the following licenses:
+
+1. **Ubuntu 24.04 LTS** - GNU GPL  
+   License: https://www.gnu.org/licenses/gpl-3.0.html
+
+2. **Django** - BSD-3-Clause  
+   License: https://opensource.org/licenses/BSD-3-Clause
+
+3. **Django REST Framework (DRF)** - BSD-3-Clause  
+   License: https://opensource.org/licenses/BSD-3-Clause
+
+4. **React** - MIT  
+   License: https://opensource.org/licenses/MIT
+
+5. **LangGraph** - Apache 2.0  
+   License: https://www.apache.org/licenses/LICENSE-2.0
+
+6. **PostgreSQL** - PostgreSQL License  
+   License: https://opensource.org/licenses/PostgreSQL
+
+7. **Axios** - MIT  
+   License: https://opensource.org/licenses/MIT
+
+8. **dotenv (python-dotenv)** - BSD-3-Clause  
+   License: https://opensource.org/licenses/BSD-3-Clause
+
+9. **Psycopg_pool** - PostgreSQL License  
+   License: https://opensource.org/licenses/PostgreSQL
+
+10. **langchain** - MIT  
+    License: https://opensource.org/licenses/MIT
+
+11. **langchain_openai** - MIT  
+    License: https://opensource.org/licenses/MIT
+
+12. **langchain_community** - MIT  
+    License: https://opensource.org/licenses/MIT
+
+13. **langchain_teddynote** - MIT  
+    License: https://opensource.org/licenses/MIT
+
+14. **NumPy** - BSD-3-Clause  
+    License: https://opensource.org/licenses/BSD-3-Clause
+
+15. **TensorFlow Keras** - Apache 2.0  
+    License: https://www.apache.org/licenses/LICENSE-2.0
+
+16. **BeautifulSoup (bs4)** - MIT  
+    License: https://opensource.org/licenses/MIT
+
+17. **Decouple (python-decouple)** - MIT  
+    License: https://opensource.org/licenses/MIT
+
+18. **Urllib (Python 내장)** - PSF  
+    License: https://opensource.org/licenses/Python-2.0
+
+19. **Asyncio (Python 내장)** - PSF  
+    License: https://opensource.org/licenses/Python-2.0
+
+20. **Typing, Typing_extensions (Python 내장)** - PSF  
+    License: https://opensource.org/licenses/Python-2.0
+
+21. **Functools (Python 내장)** - PSF  
+    License: https://opensource.org/licenses/Python-2.0
+
+22. **Re (정규식 처리, Python 내장)** - PSF  
+    License: https://opensource.org/licenses/Python-2.0
+
+23. **Pickle (Python 내장)** - PSF  
+    License: https://opensource.org/licenses/Python-2.0
+
+24. **WebBaseLoader (langchain_community)** - MIT  
+    License: https://opensource.org/licenses/MIT
+
+25. **FAISS** - MIT  
+    License: https://opensource.org/licenses/MIT
+
+26. **RecursiveCharacterTextSplitter** - MIT  
+    License: https://opensource.org/licenses/MIT
+
+27. **OpenAI API** - OpenAI License  
+    License: https://openai.com/policies
+
+28. **OpenAI Whisper** - OpenAI License  
+    License: https://openai.com/policies
+
+29. **OpenAIEmbeddings** - OpenAI License  
+    License: https://openai.com/policies
+
+---
+
+For more details, please refer to each library's official documentation and license terms.

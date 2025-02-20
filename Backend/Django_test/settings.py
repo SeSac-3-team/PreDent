@@ -15,8 +15,6 @@ from dotenv import load_dotenv
 from decouple import config
 import os
 
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(dotenv_path="myapp/.env")
@@ -26,14 +24,8 @@ DEBUG = config('DJANGO_DEBUG', default=False, cast=bool)
 API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
-
-
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1').split(',')
 
-#퍼블릭DNS : 'ec2-xx-xx-xx-xx.compute-1.amazonaws.com' 형태
-#로컬에서 테스트할 경우 : '127.0.0.1' 또는 'localhost' 추가
 
 # Application definition
 
@@ -50,8 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
 ]
 
-ASGI_APPLICATION = 'Django_test.asgi.application'  # Django ASGI 설정
-
+ASGI_APPLICATION = 'Django_test.asgi.application'  
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -65,24 +56,20 @@ MIDDLEWARE = [
 
 CSRF_TRUSTED_ORIGINS = [
     API_BASE_URL,
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "http://localhost:5175",
-    "http://127.0.0.1:8000", #ydj_serverf
-    "http://127.0.0.1:8004", #isw_server
-    "http://127.0.0.1:8010", #akw_server
+    "http://3.39.70.32",
+    'localhost',
+    '127.0.0.1',
 ]
 
-CORS_ALLOW_CREDENTIALS = True  # ✅ CSRF 쿠키 및 인증 관련 요청 허용
+CORS_ALLOW_CREDENTIALS = True  
+
 CORS_ALLOWED_ORIGINS = [
     API_BASE_URL,
-    'http://localhost:5173',
-    'http://localhost:5174',
-    'http://127.0.0.1:8000',
-    'http://127.0.0.1:8004',
-
+    "http://3.39.70.32",
+    'localhost',
+    '127.0.0.1',
 ]
-CORS_ALLOW_ALL_ORIGINS = True  # 개발용 (모든 요청 허용)
+
 ROOT_URLCONF = "Django_test.urls"
 
 TEMPLATES = [
@@ -105,8 +92,6 @@ WSGI_APPLICATION = "Django_test.wsgi.application"
 
 
 # Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -119,7 +104,6 @@ DATABASES = {
 }
 
 # Password validation
-# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -138,7 +122,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Internationalization
-# https://docs.djangoproject.com/en/5.1/topics/i18n/
 
 LANGUAGE_CODE = "en-us"
 
@@ -150,13 +133,10 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.1/howto/static-files/
-
 
 STATIC_URL = "static/"
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

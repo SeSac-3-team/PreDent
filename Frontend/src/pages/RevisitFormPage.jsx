@@ -50,7 +50,7 @@ function RevisitFormPage() {
       // 1) 기존 환자 존재 여부 확인 (재진 환자인지 확인)
       const checkData = { name, phone };
       const checkResponse = await axios.post(
-        `http://43.203.111.207/api/get_existing_patient/`,
+        `http://3.39.70.32/api/get_existing_patient/`,
         checkData,
         {
           headers: { "X-CSRFToken": csrfToken },
@@ -71,14 +71,10 @@ function RevisitFormPage() {
           updateData.purpose = purpose.trim();
         }
         updateData.agree = agree ? 1 : 0;
-        await axios.patch(
-          `http://43.203.111.207/api/update_patient/`,
-          updateData,
-          {
-            headers: { "X-CSRFToken": csrfToken },
-            withCredentials: true,
-          }
-        );
+        await axios.patch(`http://3.39.70.32/api/update_patient/`, updateData, {
+          headers: { "X-CSRFToken": csrfToken },
+          withCredentials: true,
+        });
         setMessage(
           "기존 환자 정보를 확인/갱신했습니다. 챗봇 페이지로 이동합니다."
         );
