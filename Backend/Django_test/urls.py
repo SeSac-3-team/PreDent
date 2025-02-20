@@ -16,9 +16,9 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path,include
+from django.urls import path, include
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("", include('myapp.urls')),
+    path('admin/', admin.site.urls),  # Django Admin 패널
+    path('api/', include('myapp.urls')),  # API 엔드포인트 추가
 ]

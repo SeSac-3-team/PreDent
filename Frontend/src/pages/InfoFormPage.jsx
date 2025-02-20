@@ -135,7 +135,7 @@ function InfoFormPage() {
 
       // 1) 이름과 전화번호를 기준으로 기존 환자 조회 (재진환자 여부 확인)
       const checkResponse = await axios.post(
-        "http://127.0.0.1:8000/get_existing_patient/",
+        `http://43.203.111.207/api/get_existing_patient/`,
         { name, phone },
         {
           headers: { "X-CSRFToken": csrfToken },
@@ -154,10 +154,14 @@ function InfoFormPage() {
           agree: agree ? 1 : 0,
         };
 
-        await axios.patch("http://127.0.0.1:8000/update_patient/", updateData, {
-          headers: { "X-CSRFToken": csrfToken },
-          withCredentials: true,
-        });
+        await axios.patch(
+          `http://43.203.111.207/api/update_patient/`,
+          updateData,
+          {
+            headers: { "X-CSRFToken": csrfToken },
+            withCredentials: true,
+          }
+        );
 
         setMessage("기존 환자 정보가 업데이트되었습니다.");
         // 기존 환자의 PID와 내원 목적을 ChatPage로 전달
@@ -167,7 +171,7 @@ function InfoFormPage() {
       } else {
         // 신규 환자: 입력한 정보로 DB에 저장
         const saveResponse = await axios.post(
-          "http://127.0.0.1:8000/save_patient/",
+          `http://43.203.111.207/api/save_patient/`,
           data,
           {
             headers: { "X-CSRFToken": csrfToken },

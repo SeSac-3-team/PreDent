@@ -8,7 +8,7 @@ export default function DoctSidebar({ onRecordSelect }) {
 
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/today_medicerts/")
+      .get(`http://43.203.111.207/api/today_medicerts/`)
       .then((response) => {
         setRecords(response.data);
       })

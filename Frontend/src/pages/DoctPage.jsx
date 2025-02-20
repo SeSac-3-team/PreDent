@@ -17,7 +17,7 @@ export default function DoctPage() {
     setError(null);
 
     axios
-      .get(`http://127.0.0.1:8000/medicert_detail/${mecid}/`)
+      .get(`http://43.203.111.207/api/medicert_detail/${mecid}/`)
       .then((response) => {
         setPatientData(response.data);
       })

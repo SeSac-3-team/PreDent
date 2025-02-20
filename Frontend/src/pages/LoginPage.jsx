@@ -9,7 +9,7 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   const handleLogin = async () => {
-    const response = await fetch("http://127.0.0.1:8000/authenticate/", {
+    const response = await fetch(`http://43.203.111.207/api/authenticate/`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${password}`,

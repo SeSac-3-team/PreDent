@@ -162,7 +162,7 @@ function ChatPage() {
           };
 
           axios
-            .post("http://127.0.0.1:8000/save-object/", data)
+            .post(`http://43.203.111.207/api/save-object/`, data)
             .then((response) => console.log("데이터 저장 성공:", response.data))
             .catch((error) => console.error("데이터 저장 실패:", error));
 

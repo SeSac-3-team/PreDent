@@ -1,7 +1,10 @@
 // src/services/api.js
 // vas
+
 export async function fetchVASResponse(userMessage) {
-  const apiUrl = `http://127.0.0.1:8000/vas/${encodeURIComponent(userMessage)}`;
+  const apiUrl = `http://43.203.111.207/api/vas/${encodeURIComponent(
+    userMessage
+  )}`;
   try {
     const response = await fetch(apiUrl);
     if (response.ok) {
@@ -16,7 +19,7 @@ export async function fetchVASResponse(userMessage) {
 }
 // presum
 export async function fetchPresumResponse(userMessage) {
-  const apiUrl = `http://127.0.0.1:8000/presum/${encodeURIComponent(
+  const apiUrl = `http://43.203.111.207/api/presum/${encodeURIComponent(
     userMessage
   )}`;
   try {
@@ -33,7 +36,7 @@ export async function fetchPresumResponse(userMessage) {
 }
 // LLM 답변을 answer과 patid 객체로 받아 POST로 전송
 export async function fetchLLMResponse({ answer, patid }) {
-  const apiUrl = "http://127.0.0.1:8000/chat/";
+  const apiUrl = `http://43.203.111.207/api/chat/`;
   try {
     const response = await fetch(apiUrl, {
       method: "POST",

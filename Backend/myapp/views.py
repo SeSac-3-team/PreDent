@@ -21,6 +21,9 @@ from decouple import config
 load_dotenv(dotenv_path="myapp/.env")
 # Create your views here.
 
+def index(request):
+    return JsonResponse({"message": "API is working!"})
+
 def vas_response(request, input_string):
 	response = vas_cal(input_string)
 	return JsonResponse({'vas' : str(response)})

@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('', views.index, name='index'),  # 기본 엔드포인트 (http://localhost:8000/api/)
     path("vas/<str:input_string>", views.vas_response, name="vas_response"),
     path("presum/<str:input_string>", views.presum_response, name="presum_response"),
     path("save-object/", views.medicert_save, name="medicert_save"),    

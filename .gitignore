@@ -175,4 +175,4 @@ cython_debug/
 *.pckl
 
 faiss_index/
-
+static/
