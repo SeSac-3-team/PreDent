@@ -8,7 +8,7 @@ PreDent Chatbot Service는 치과 진료 과정에서 환자의 증상을 체계
 
 ## 🎥 프로젝트 시연 영상
 
-[![영상 보기](https://img.youtube.com/vi/EZBex0batkg/maxresdefault.jpg)](https://youtu.be/EZBex0batkg)
+[![영상 보기](https://img.youtube.com/vi/EZBex0batkg/0.jpg)](https://youtu.be/EZBex0batkg)
 
 ## 🛠️ 기술 스택
 
