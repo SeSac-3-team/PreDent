@@ -6,9 +6,9 @@ PreDent Chatbot Service는 치과 진료 과정에서 환자의 증상을 체계
 환자의 **VAS(Visual Analogue Scale) 통증 척도 시각화**와 **가능성 있는 질환을 포함한 사전 진단서 생성** 기능을 제공하여, 환자와 의료진 간의 효율적인 진료 프로세스 개선을 목표로 합니다.  
 또한, Django와 React 기반으로 개발되어, 안정적이면서도 확장 가능한 서비스를 제공합니다.
 
-## 🎥 프로젝트 데모 영상
+## 🎥 프로젝트 시연 영상
 
-[![🎥 영상 보기](https://img.youtube.com/vi/EZBex0batkg/maxresdefault.jpg)](https://youtu.be/EZBex0batkg)
+[![영상 보기](https://img.youtube.com/vi/EZBex0batkg/maxresdefault.jpg)](https://youtu.be/EZBex0batkg)
 
 ## 🛠️ 기술 스택
 
